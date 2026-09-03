@@ -116,6 +116,12 @@ Essa característica evita que a ausência de internet impeça a realização da
 
 ---
 
+### Iluminação
+
+O aplicativo poderá ser utilizado em ambientes externos, inclusive sob sol forte, como em quintais, calçadas e durante visitas domiciliares. Essa condição pode dificultar a leitura da tela, principalmente em smartphones mais simples. Por isso, a interface deverá utilizar alto contraste, com textos e elementos visuais facilmente identificáveis. O estudo de caso recomenda o uso de Dark Mode, textos claros ou cores de destaque, de forma que o ACS não precise aumentar o brilho do aparelho ao máximo, contribuindo também para a economia de bateria.
+
+---
+
 ### Uso em ambientes externos
 
 O aplicativo poderá ser utilizado sob forte iluminação solar.
@@ -408,6 +414,14 @@ Existe um compromisso de anonimização dos registros armazenados.
 O sistema não deverá utilizar nome ou CPF no histórico salvo, utilizando somente apelidos ou códigos internos quando necessário.
 
 Também deverá existir uma política clara de privacidade relacionada à exclusão definitiva das informações armazenadas no Firebase.
+
+---
+
+### Armazenamento
+
+O aplicativo deverá permitir o armazenamento temporário dos dados no próprio dispositivo quando não houver conexão com a internet. Esses registros deverão permanecer em uma fila local até que o ACS volte a ter acesso à rede, por exemplo, ao retornar à UBS e conectar-se ao Wi-Fi. Nesse momento, os registros anônimos poderão ser enviados ao Firebase por meio de sincronização em segundo plano.
+
+Além disso, o armazenamento deve respeitar as regras de privacidade estabelecidas no projeto. O histórico salvo não poderá conter CPF ou nome do paciente, utilizando apenas apelido ou código interno quando necessário. O projeto também exige uma política clara sobre a exclusão definitiva dos dados armazenados no Firebase.
 
 ---
 
