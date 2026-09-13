@@ -1,5 +1,18 @@
 # Changelog
 
+## [13/09/2026]
+
+### Adicionado
+
+- Definição das funcionalidades principais do CardioRisco.
+- Elaboração dos requisitos funcionais relacionados às funcionalidades definidas.
+- Elaboração dos requisitos não funcionais relacionados a usabilidade, acessibilidade visual, privacidade, desempenho, compatibilidade, conectividade e armazenamento.
+
+### Alterado
+
+- Atualização do `README.md` com a responsabilidade de José Victor na Atividade 03.
+- Atualização do arquivo `docs/requisitos.md`.
+
 ## [09/09/2026]
 
 ### Adicionado
