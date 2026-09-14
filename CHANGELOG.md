@@ -1,5 +1,21 @@
 # Changelog
 
+# Registro de alterações
+
+## [14/09/2026]
+
+### Adicionado
+
+- Elaboração da seção **2.4 — CRUD**, definindo as operações de criação, consulta, atualização e exclusão dos registros de avaliações cardiovasculares.
+- Elaboração da seção **2.5 — Priorização**, classificando as funcionalidades do CardioRisco em essenciais, importantes e secundárias.
+- Inclusão da justificativa relacionada à aplicação das operações CRUD no sistema.
+
+### Alterado
+
+- Atualização do `README.md` com a responsabilidade de Erick Gabriel na Atividade 03.
+- Atualização da seção de responsabilidades da Atividade 03, detalhando as funções de cada integrante.
+- Atualização do arquivo `docs/requisitos.md` com as definições relacionadas ao CRUD e à priorização das funcionalidades.
+
 ## [13/09/2026]
 
 ### Adicionado
