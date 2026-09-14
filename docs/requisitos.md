@@ -215,3 +215,93 @@ Como o CardioRisco trabalha com informações relacionadas à saúde, a privacid
 O projeto deverá reduzir ao mínimo a identificação dos pacientes, evitando armazenar nome e CPF e utilizando somente os dados necessários para a finalidade da avaliação.
 
 A implementação futura deverá observar os princípios e obrigações aplicáveis da Lei Geral de Proteção de Dados Pessoais (LGPD), principalmente no tratamento de dados relacionados à saúde.
+
+---
+
+## 2.4 CRUD
+
+O CRUD define as operações que poderão ser realizadas sobre os registros
+de avaliações cardiovasculares do aplicativo CardioRisco.
+
+  -----------------------------------------------------------------------
+  Operação                            Aplicação no CardioRisco
+  ----------------------------------- -----------------------------------
+  **C --- Criadas**                   O profissional poderá criar novos
+                                      registros de avaliação, informando
+                                      os dados demográficos,
+                                      comportamentais e clínicos do
+                                      paciente, além do resultado do
+                                      risco cardiovascular.
+
+  **R --- Consultadas**               O sistema poderá consultar os
+                                      registros armazenados localmente,
+                                      permitindo visualizar os dados e os
+                                      resultados das avaliações
+                                      realizadas.
+
+  **U --- Atualizadas**               Os registros poderão ser
+                                      atualizados antes da conclusão da
+                                      avaliação, caso seja necessário
+                                      corrigir ou alterar algum dado
+                                      informado incorretamente.
+
+  **D --- Excluídas**                 O usuário poderá excluir
+                                      definitivamente os registros
+                                      armazenados, respeitando as regras
+                                      de privacidade e proteção de dados.
+  -----------------------------------------------------------------------
+
+**Justificativa:** As operações de criação, consulta, atualização e
+exclusão são aplicáveis ao CardioRisco porque o aplicativo precisa
+registrar avaliações, permitir a correção de informações, consultar
+dados armazenados e possibilitar a exclusão dos registros. Essas
+operações também contribuem para a organização dos dados e para o
+cumprimento das regras de privacidade do projeto.
+
+## 2.5 Priorização
+
+As funcionalidades do CardioRisco foram classificadas conforme sua
+importância para a proposta principal do aplicativo.
+
+## Essenciais
+
+São indispensáveis para que o aplicativo consiga realizar sua função
+principal: avaliar o risco cardiovascular.
+
+1.  **F01 --- Coleta de dados demográficos e comportamentais:** permite
+    informar idade, sexo, tabagismo e diabetes.
+2.  **F02 --- Coleta de dados clínicos:** possibilita registrar pressão
+    arterial, colesterol total e HDL.
+3.  **F03 --- Validação dos dados informados:** evita que o cálculo seja
+    realizado com informações ausentes ou inválidas.
+4.  **F04 --- Cálculo do risco cardiovascular:** realiza a avaliação do
+    risco de ocorrência de um evento cardiovascular em 10 anos.
+5.  **F08 --- Funcionamento offline:** permite realizar avaliações mesmo
+    em locais sem acesso à internet, uma necessidade importante para o
+    uso durante visitas domiciliares.
+
+## Importantes
+
+Agregam valor ao aplicativo e melhoram a interpretação dos resultados e
+a organização das avaliações.
+
+1.  **F05 --- Classificação do nível de risco:** facilita a compreensão
+    do resultado ao classificá-lo como baixo, intermediário ou alto.
+2.  **F07 --- Recomendações conforme o resultado:** apresenta
+    orientações de prevenção, mudanças de hábitos ou necessidade de
+    encaminhamento.
+3.  **F09 --- Armazenamento local e sincronização posterior:** evita a
+    perda dos registros realizados sem conexão e permite a sincronização
+    quando a internet estiver disponível.
+
+## Secundárias
+
+Podem ser desenvolvidas ou aprimoradas posteriormente, pois não impedem
+a realização do cálculo principal do risco cardiovascular.
+
+1.  **F06 --- Visualização do risco por velocímetro:** apresenta o
+    resultado de maneira visual, facilitando a explicação ao paciente.
+    Apesar de contribuir para a compreensão da avaliação, o cálculo pode
+    ser realizado sem esse recurso gráfico.
+
+---
