@@ -1,7 +1,5 @@
 # Changelog
 
-# Registro de alterações
-
 ## [14/09/2026]
 
 ### Adicionado
