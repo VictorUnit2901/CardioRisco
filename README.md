@@ -38,3 +38,5 @@ PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS-GP0015NOT07A
 - José Victor: responsável pela definição das funcionalidades do CardioRisco, transformação dessas funcionalidades em requisitos funcionais e elaboração dos requisitos não funcionais, considerando usabilidade, privacidade, desempenho, compatibilidade, armazenamento e conectividade.
 
 - Erick Gabriel: responsável pela elaboração do CRUD do sistema, identificando e organizando as operações de criação, consulta, atualização e exclusão dos registros de avaliações cardiovasculares. Também definiu como essas operações seriam aplicadas ao armazenamento e gerenciamento dos dados do aplicativo e pela priorização das funcionalidades, classificando os recursos do CardioRisco de acordo com sua importância para o funcionamento do sistema. As funcionalidades foram organizadas em categorias essenciais, importantes e secundárias, considerando quais recursos são indispensáveis para a realização da avaliação cardiovascular e quais podem ser aprimorados posteriormente.
+
+-João Gabriel: Responsável pela criação do Slide sobre os requisitos e as funcionalidades para a apresentação.
