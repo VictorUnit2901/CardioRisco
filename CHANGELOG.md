@@ -1,5 +1,12 @@
 # Changelog
 
+## [15/09/2026]
+
+
+### Adicionado
+
+- Criação do Slide sobre Requisitos e Funcionalidades.
+
 ## [14/09/2026]
 
 ### Adicionado
@@ -52,3 +59,4 @@
 - Criação do CHANGELOG.md.
 - Criação da análise inicial do estudo de caso.
 - Criação do arquivo `docs/estudo-de-caso.md`.
+- 
