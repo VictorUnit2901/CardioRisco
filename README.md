@@ -33,7 +33,9 @@ PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS-GP0015NOT07A
 - João Gabriel: Revisão da documentação e organização dos arquivos no repositório.
 - Erick Gabriel Lima Matos: Criação dos slides e fez a apresentação 
 
+
 ## Responsabilidades — Atividade 03 16/09/2026
+
 
 - José Victor: responsável pela definição das funcionalidades do CardioRisco, transformação dessas funcionalidades em requisitos funcionais e elaboração dos requisitos não funcionais, considerando usabilidade, privacidade, desempenho, compatibilidade, armazenamento e conectividade.
 
