@@ -42,3 +42,9 @@ PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS-GP0015NOT07A
 - Erick Gabriel: responsável pela elaboração do CRUD do sistema, identificando e organizando as operações de criação, consulta, atualização e exclusão dos registros de avaliações cardiovasculares. Também definiu como essas operações seriam aplicadas ao armazenamento e gerenciamento dos dados do aplicativo e pela priorização das funcionalidades, classificando os recursos do CardioRisco de acordo com sua importância para o funcionamento do sistema. As funcionalidades foram organizadas em categorias essenciais, importantes e secundárias, considerando quais recursos são indispensáveis para a realização da avaliação cardiovascular e quais podem ser aprimorados posteriormente.
 
 - João Gabriel: Responsável pela criação do Slide sobre os requisitos e as funcionalidades para a apresentação.
+
+
+## Responsabilidades — Atividade 04 16/09/2026
+
+- José Victor: responsável pelo desenvolvimento e organização do protótipo de alta fidelidade do CardioRisco e pela documentação das principais escolhas de interface, incluindo cores, tipografia, organização das informações, navegação, componentes, acessibilidade e decisões relacionadas ao contexto de uso.
+

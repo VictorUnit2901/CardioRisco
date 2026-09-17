@@ -1,5 +1,16 @@
 # Changelog
 
+## [16/09/2026]
+
+### Adicionado
+
+- Arquivo `docs/prototipoAltaFidelidade.pdf`.
+- Documento `docs/escolhasInterface.md`.
+
+### Alterado
+
+- Atualização do `README.md` com a responsabilidade de José Victor na Atividade 04.
+
 ## [15/09/2026]
 
 
