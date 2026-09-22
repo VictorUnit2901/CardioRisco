@@ -1,5 +1,15 @@
 # Changelog
 
+## [22/09/2026]
+
+### Adicionado
+
+- Arquivo `docs/prototipoBaixaFidelidade.pdf`.
+
+### Alterado
+
+- Atualização do `README.md` com a responsabilidade de Erick Gabriel na Atividade 04.
+
 ## [16/09/2026]
 
 ### Adicionado
