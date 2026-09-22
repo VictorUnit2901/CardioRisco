@@ -44,7 +44,9 @@ PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS-GP0015NOT07A
 - João Gabriel: Responsável pela criação do Slide sobre os requisitos e as funcionalidades para a apresentação.
 
 
-## Responsabilidades — Atividade 04 16/09/2026
+## Responsabilidades — Atividade 04 22/09/2026
 
 - José Victor: responsável pelo desenvolvimento e organização do protótipo de alta fidelidade do CardioRisco e pela documentação das principais escolhas de interface, incluindo cores, tipografia, organização das informações, navegação, componentes, acessibilidade e decisões relacionadas ao contexto de uso.
+
+- Erick Gabriel: responsável pelo desenvolvimento e organização do protótipo de baixa fidelidade do CardioRisco e pela documentação do fluxo de navegação entre as telas, incluindo a estruturação das etapas de coleta de dados (demográficos/comportamentais e clínicos), a definição da sequência lógica das telas (dados → resultado → orientações → histórico) e o mapeamento das transições e retornos do fluxo.
 
