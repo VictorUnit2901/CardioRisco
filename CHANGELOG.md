@@ -1,5 +1,11 @@
 # Changelog
 
+## [23/09/2026] 
+
+### Adicionado
+
+- Arquivo 'docs/Apresentação_ativ4.pdf'.
+
 ## [22/09/2026]
 
 ### Adicionado
