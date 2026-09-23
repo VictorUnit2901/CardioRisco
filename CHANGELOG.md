@@ -4,7 +4,7 @@
 
 ### Adicionado
 
-- Arquivo 'docs/Apresentação_ativ4.pdf'.
+- Arquivo `docs/Apresentação_ativ4.pdf`.
 
 ## [22/09/2026]
 
