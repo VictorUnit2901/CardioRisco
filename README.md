@@ -51,3 +51,7 @@ PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS-GP0015NOT07A
 
 - João Gabriel: Verificar toda a documentaçaõ para criação do slide para Apresentação do dia 23/09/2026.
 
+- ## Responsabilidade - Apresentação Final 30/09/2026
+
+- João Gabriel: Fiquei responsável pela criação do slide para a apresentação e não pude estar presente por motivos de saúde, irei apresentar o atestado após os dias que recebi.
+
