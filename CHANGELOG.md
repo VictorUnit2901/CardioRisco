@@ -1,4 +1,9 @@
 # Changelog
+## [30/09/2026]
+
+###Adicionado
+
+- Arquivo `docs/apresentacaoFinalUnidadeI.pdf` 
 
 ## [23/09/2026] 
 
