@@ -1,4 +1,20 @@
 # Changelog
+
+## [07/11/2026]
+
+### Adicionado
+
+- Arquivo `docs/prototipoAltaFidelidadeUnidade2.pdf` com o protótipo de alta fidelidade da Unidade II: telas de login, cadastro, home, histórico, paciente/evolução, painel e conta e privacidade.
+- Tema visual (cores e estilos de texto) e componentes reutilizáveis no Figma, como base para o tema do app em Flutter.
+
+### Alterado
+
+- Tela 1: código do paciente gerado automaticamente, sem nome ou CPF.
+- Tela 2: opção "Usa remédio para controlar a pressão?" dentro da pergunta de pressão (o formulário continua com 7 perguntas) e botão renomeado para "Avaliar risco".
+- Tela 3: percentual de risco no velocímetro e aviso de que o resultado é uma estimativa e não substitui o profissional de saúde.
+- Tela 4: classificação do risco, encaminhamento sugerido para a UBS e recomendações personalizadas conforme as respostas.
+- Restaurado o nome `docs/escolhasInterface.md`, exigido na Atividade 04.
+
 ## [30/09/2026]
 
 ###Adicionado
