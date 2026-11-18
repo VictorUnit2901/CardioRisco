@@ -1,5 +1,11 @@
 # Changelog
 
+## [18/11/2026]
+
+### Adicionado
+
+- Documento `docs/diagramaClasses.md` com o diagrama de classes (modelos de domínio) do CardioRisco: entidades, atributos, métodos, relacionamentos e regras de negócio.
+
 ## [07/11/2026]
 
 ### Adicionado
