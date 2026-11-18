@@ -4,6 +4,16 @@
 
 ### Adicionado
 
+- Atualização do diagrama de caso de uso do CardioRisco, contemplando as funcionalidades e interações dos usuários com o sistema.
+- Atualização do fluxo de navegação, representando o caminho percorrido entre as telas e as principais funcionalidades do aplicativo.
+- Organização dos fluxos de acesso, avaliação de risco cardiovascular, consulta ao histórico e visualização dos resultados.
+- Criação do arquivo `docs/diagramaCasodeUso.md`.
+- Criação do arquivo `docs/FluxodeNavegação.md`.
+
+## [18/11/2026]
+
+### Adicionado
+
 - Documento `docs/diagramaClasses.md` com o diagrama de classes (modelos de domínio) do CardioRisco: entidades, atributos, métodos, relacionamentos e regras de negócio.
 
 ## [07/11/2026]
@@ -23,7 +33,7 @@
 
 ## [30/09/2026]
 
-###Adicionado
+### Adicionado
 
 - Arquivo `docs/apresentacaoFinalUnidadeI.pdf` 
 
