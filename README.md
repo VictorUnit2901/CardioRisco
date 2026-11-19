@@ -10,7 +10,6 @@ cardiovasculares em um período de 10 anos.
 
 - Erick Gabriel Lima Matos
 - José Victor Barbosa Neves
-- João Afonso Lopes de Carvalho 
 - João Gabriel da Costa Souza
 
 ## Turma
