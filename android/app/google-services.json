@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "847080614374",
+    "project_id": "cardiorisco",
+    "storage_bucket": "cardiorisco.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847080614374:android:9361d6c9a809bf103b8e27",
+        "android_client_info": {
+          "package_name": "com.example.cardiorisco"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxSJyczsiKlVKrci6h2yHQzyzUrLPX7zg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

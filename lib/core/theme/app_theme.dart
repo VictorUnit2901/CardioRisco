@@ -7,7 +7,7 @@ class AppTheme {
   static const Color surfaceVariant = Color(0xFF24303D);
   static const Color primaryGreen = Color(0xFF2ECC71);
   static const Color warningYellow = Color(0xFFF1C40F);
-  static const Color dangerRed = Color(0xFFE74C3C);
+  static const Color dangerRed = Color(0xFFE74C3C); 
   static const Color textPrimary = Color(0xFFF4F6F8);
   static const Color textSecondary = Color(0xFFA0AEC0);
 
