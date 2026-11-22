@@ -1,5 +1,20 @@
 # Changelog
 
+## [22/11/2026]
+
+### Adicionado
+
+- Implementação do `AuthService` com métodos de `login`, `cadastrar` e `logout` integrados ao Firebase Authentication e Cloud Firestore (coleção `profissionais`) e persistência local via `LocalStorageService`.
+- Conexão da `AuthScreen` ao `AuthService` real (substituindo mocks locais anteriores), com tratamento de erros do Firebase Auth, indicador de carregamento durante a requisição e encerramento de sessão no logout.
+- Validação do fluxo de cadastro e login em ambiente Web, refletindo automaticamente na criação/atualização de usuários no Firebase Authentication e de perfis no Firestore.
+
+## [18/11/2026]
+
+### Adicionado
+
+- Diagrama de classes do domínio do CardioRisco (`documentos` / `diagramaClasses.md`), contemplando entidades, atributos, métodos, relacionamentos e regras de negócio.
+- Atualizações e registros do planejamento do CardioRisco no `CHANGELOG.md` (diagrama de caso de uso, fluxo de navegação e documentação do projeto).
+
 ## [18/11/2026]
 
 ### Adicionado
