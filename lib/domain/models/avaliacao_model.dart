@@ -88,7 +88,22 @@ class AvaliacaoModel {
 
   /// Validação clínica: devolve a lista de problemas encontrados.
   /// Se a lista vier vazia, a avaliação pode ir para o cálculo.
-  List<String> validar() {
+  ///
+  /// [etapa] permite validar só uma parte do formulário:
+  /// 1 = dados pessoais, 2 = dados clínicos, vazio = tudo.
+  List<String> validar({int? etapa}) {
+    final erros = <String>[];
+    if (etapa == null || etapa == 1) {
+      erros.addAll(_validarDadosPessoais());
+    }
+    if (etapa == null || etapa == 2) {
+      erros.addAll(_validarDadosClinicos());
+    }
+    return erros;
+  }
+
+  /// Etapa 1: idade, sexo, tabagismo e diabetes.
+  List<String> _validarDadosPessoais() {
     final erros = <String>[];
 
     final idade = this.idade;
@@ -108,6 +123,13 @@ class AvaliacaoModel {
     if (diabetico == null) {
       erros.add('Informe se o paciente tem diabetes.');
     }
+
+    return erros;
+  }
+
+  /// Etapa 2: pressão, remédio para pressão, colesterol total e HDL.
+  List<String> _validarDadosClinicos() {
+    final erros = <String>[];
 
     final pressao = pressaoSistolica;
     if (pressao == null) {

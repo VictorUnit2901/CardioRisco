@@ -7,10 +7,15 @@
 - Enums de domínio `Sexo` e `NivelRisco` e a classe `ResultadoRisco`, com a classificação do risco pelas faixas do Escore de Risco Global da SBC (`lib/domain/models/`).
 - Calculadora de risco cardiovascular em 10 anos pelo modelo de Framingham (2008), seguindo a interface `CalculadoraRisco` para permitir outros modelos de cálculo (`lib/domain/services/`).
 - 11 testes automatizados do cálculo, da classificação do risco e da validação clínica (`test/domain/calculadora_framingham_test.dart`).
+- Dependência `provider` para o gerenciamento de estado do app, como pede o aditivo da Unidade II.
+- Formulário de avaliação em 2 etapas (Telas 1 e 2): 7 perguntas, validação por etapa, campos numéricos tolerantes a erros de digitação, código anônimo do paciente (sem nome ou CPF) e modo edição para avaliações já salvas (`lib/presentation/avaliacao/`).
+- Salvamento automático do formulário em andamento: o rascunho fica salvo no aparelho e é retomado na mesma etapa se o app fechar no meio da visita (`FormularioAvaliacaoController`).
+- 5 novos testes automatizados: validação por etapa e controlador do formulário (`test/presentation/formulario_avaliacao_controller_test.dart`).
 
 ### Alterado
 
 - `AvaliacaoModel`: sexo passa a ser o enum `Sexo`, o resultado do risco passa a ser um objeto `ResultadoRisco`, e foram adicionados os métodos `estaCompleta()` e `validar()` (validações clínicas de idade, pressão arterial, colesterol total e HDL).
+- `AvaliacaoModel.validar()` passa a aceitar a etapa (`validar(etapa: 1)` ou `validar(etapa: 2)`), para o formulário cobrar só as perguntas da etapa atual.
 
 ## [22/11/2026]
 
