@@ -1,5 +1,17 @@
 # Changelog
 
+## [24/11/2026]
+
+### Adicionado
+
+- Enums de domínio `Sexo` e `NivelRisco` e a classe `ResultadoRisco`, com a classificação do risco pelas faixas do Escore de Risco Global da SBC (`lib/domain/models/`).
+- Calculadora de risco cardiovascular em 10 anos pelo modelo de Framingham (2008), seguindo a interface `CalculadoraRisco` para permitir outros modelos de cálculo (`lib/domain/services/`).
+- 11 testes automatizados do cálculo, da classificação do risco e da validação clínica (`test/domain/calculadora_framingham_test.dart`).
+
+### Alterado
+
+- `AvaliacaoModel`: sexo passa a ser o enum `Sexo`, o resultado do risco passa a ser um objeto `ResultadoRisco`, e foram adicionados os métodos `estaCompleta()` e `validar()` (validações clínicas de idade, pressão arterial, colesterol total e HDL).
+
 ## [22/11/2026]
 
 ### Adicionado
