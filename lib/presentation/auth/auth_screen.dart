@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/remote/auth_service.dart';
 import '../../domain/models/profissional_model.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -10,8 +12,11 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  final AuthService _authService = AuthService();
+
   bool _isCadastro = false;
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   // Controllers de Login e Cadastro
   final _nomeController = TextEditingController();
@@ -32,49 +37,98 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
-  void _submeter() {
+  void _mostrarMensagem(String mensagem) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem)),
+    );
+  }
+
+  String _mensagemErroAuth(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'invalid-email':
+        return 'E-mail inválido.';
+      case 'user-not-found':
+      case 'wrong-password':
+      case 'invalid-credential':
+        return 'E-mail ou senha incorretos.';
+      case 'email-already-in-use':
+        return 'Este e-mail já está cadastrado.';
+      case 'weak-password':
+        return 'A senha deve ter pelo menos 8 caracteres.';
+      case 'network-request-failed':
+        return 'Sem conexão com a internet para autenticar.';
+      default:
+        return e.message ?? 'Erro na autenticação (${e.code}).';
+    }
+  }
+
+  Future<void> _submeter() async {
+    if (_isLoading) return;
+
     final email = _emailController.text.trim();
+    final senha = _senhaController.text;
+
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Informe seu e-mail profissional.')),
-      );
+      _mostrarMensagem('Informe seu e-mail profissional.');
+      return;
+    }
+    if (senha.isEmpty) {
+      _mostrarMensagem('Informe sua senha.');
       return;
     }
 
     if (_isCadastro) {
-      if (!_aceitouPrivacidade) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Aceite a Política de Privacidade para continuar.'),
-          ),
-        );
+      if (_nomeController.text.trim().isEmpty) {
+        _mostrarMensagem('Informe o nome do profissional.');
         return;
       }
-      setState(() {
-        _profissionalLogado = ProfissionalModel(
-          uid: 'local_${DateTime.now().millisecondsSinceEpoch}',
-          nome: _nomeController.text.trim().isEmpty
-              ? 'Mariana Souza'
-              : _nomeController.text.trim(),
+      if (senha.length < 8) {
+        _mostrarMensagem('A senha deve ter no mínimo 8 caracteres.');
+        return;
+      }
+      if (!_aceitouPrivacidade) {
+        _mostrarMensagem('Aceite a Política de Privacidade para continuar.');
+        return;
+      }
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      ProfissionalModel? profissional;
+
+      if (_isCadastro) {
+        profissional = await _authService.cadastrar(
+          nome: _nomeController.text.trim(),
           email: email,
-          ubs: _ubsController.text.trim().isEmpty
-              ? 'UBS Santa Maria'
-              : _ubsController.text.trim(),
+          senha: senha,
+          ubs: _ubsController.text.trim(),
           perfilAcesso: _perfilAcesso,
-          aceitouPrivacidade: true,
+          aceitouPrivacidade: _aceitouPrivacidade,
         );
-      });
-    } else {
-      setState(() {
-        _profissionalLogado = ProfissionalModel(
-          uid: 'local_user',
-          nome: 'Mariana Souza',
+      } else {
+        profissional = await _authService.login(
           email: email,
-          ubs: 'UBS Santa Maria',
-          perfilAcesso: 'ACS',
-          aceitouPrivacidade: true,
+          senha: senha,
         );
-      });
+      }
+
+      if (!mounted) return;
+
+      if (profissional != null) {
+        setState(() => _profissionalLogado = profissional);
+      } else {
+        _mostrarMensagem('Não foi possível concluir o acesso.');
+      }
+    } on FirebaseAuthException catch (e) {
+      _mostrarMensagem(_mensagemErroAuth(e));
+    } catch (e) {
+      _mostrarMensagem('Erro inesperado ao autenticar: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -117,9 +171,20 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 const Spacer(),
                 ElevatedButton(
-                  onPressed: () {
-                    setState(() => _profissionalLogado = null);
-                  },
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          setState(() => _isLoading = true);
+                          try {
+                            await _authService.logout();
+                            if (!mounted) return;
+                            setState(() => _profissionalLogado = null);
+                          } finally {
+                            if (mounted) {
+                              setState(() => _isLoading = false);
+                            }
+                          }
+                        },
                   child: const Text('SAIR DA CONTA'),
                 ),
                 const SizedBox(height: 12),
@@ -244,14 +309,22 @@ class _AuthScreenState extends State<AuthScreen> {
               ],
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: _submeter,
-                child: Text(_isCadastro ? 'CRIAR CONTA' : 'ENTRAR'),
+                onPressed: _isLoading ? null : _submeter,
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(_isCadastro ? 'CRIAR CONTA' : 'ENTRAR'),
               ),
               const SizedBox(height: 10),
               TextButton(
-                onPressed: () {
-                  setState(() => _isCadastro = !_isCadastro);
-                },
+                onPressed: _isLoading
+                    ? null
+                    : () {
+                        setState(() => _isCadastro = !_isCadastro);
+                      },
                 child: Text(
                   _isCadastro
                       ? 'Já tem conta? Entrar'
