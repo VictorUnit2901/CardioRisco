@@ -129,5 +129,23 @@ void main() {
 
       expect(erros, contains('O HDL deve ser menor que o colesterol total.'));
     });
+
+    test('validar(etapa: 1) confere só os dados pessoais', () {
+      // Etapa 1 preenchida e etapa 2 ainda vazia, como no meio do formulário.
+      final avaliacao = AvaliacaoModel(
+        id: 'teste',
+        codigoPaciente: 'P-0001',
+        profissionalId: 'acs-teste',
+        dataHora: DateTime(2026, 11, 22),
+        idade: 56,
+        sexo: Sexo.masculino,
+        fumante: false,
+        diabetico: false,
+        atualizadoEm: DateTime(2026, 11, 22),
+      );
+
+      expect(avaliacao.validar(etapa: 1), isEmpty);
+      expect(avaliacao.validar(etapa: 2), isNotEmpty);
+    });
   });
 }
