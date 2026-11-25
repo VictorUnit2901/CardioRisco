@@ -80,5 +80,20 @@ void main() {
       expect(segundo.rascunhoSalvo, isTrue);
       segundo.dispose();
     });
+
+    test('novaAvaliacao começa do zero com o próximo código', () async {
+      final form = FormularioAvaliacaoController();
+      await form.iniciar();
+      preencherEtapa1(form);
+      form.avancar();
+
+      await form.novaAvaliacao();
+
+      expect(form.codigoPaciente, 'P-0002');
+      expect(form.etapa, 1);
+      expect(form.idade, isNull);
+      expect(form.sexo, isNull);
+      form.dispose();
+    });
   });
 }
