@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/models/enums_avaliacao.dart';
 import '../../../domain/models/fator_risco.dart';
+import '../../../domain/models/recomendacao.dart';
 
-/// Laranja usado nos ícones de alguns fatores de risco.
+/// Cores extras usadas nos ícones dos fatores e das recomendações.
 const Color _laranja = Color(0xFFF39C12);
+const Color _roxo = Color(0xFFA78BFA);
+const Color _azul = Color(0xFF22B8CF);
 
 /// Cor, ícone e texto de cada nível de risco nas Telas 3 e 4.
 /// Fica na camada de apresentação porque é só aparência: o domínio
@@ -53,5 +56,28 @@ extension FatorRiscoVisual on FatorRisco {
         FatorRisco.tabagismo => AppTheme.dangerRed,
         FatorRisco.diabetes => _laranja,
         FatorRisco.idade => AppTheme.warningYellow,
+      };
+}
+
+/// Ícone e cor de cada recomendação na Tela 4.
+extension TemaRecomendacaoVisual on TemaRecomendacao {
+  IconData get icone => switch (this) {
+        TemaRecomendacao.encaminhamento => Icons.assignment_ind_outlined,
+        TemaRecomendacao.tabagismo => Icons.smoke_free,
+        TemaRecomendacao.atividadeFisica => Icons.directions_walk,
+        TemaRecomendacao.alimentacao => Icons.restaurant_outlined,
+        TemaRecomendacao.diabetes => Icons.bloodtype_outlined,
+        TemaRecomendacao.acompanhamento => Icons.medical_services_outlined,
+        TemaRecomendacao.peso => Icons.monitor_weight_outlined,
+      };
+
+  Color get cor => switch (this) {
+        TemaRecomendacao.encaminhamento => AppTheme.warningYellow,
+        TemaRecomendacao.tabagismo => AppTheme.dangerRed,
+        TemaRecomendacao.atividadeFisica => AppTheme.primaryGreen,
+        TemaRecomendacao.alimentacao => _laranja,
+        TemaRecomendacao.diabetes => _roxo,
+        TemaRecomendacao.acompanhamento => AppTheme.warningYellow,
+        TemaRecomendacao.peso => _azul,
       };
 }

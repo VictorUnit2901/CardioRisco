@@ -80,17 +80,36 @@ class FormularioAvaliacaoController extends ChangeNotifier {
       }
     }
 
-    _base = inicial;
-    _idade = inicial.idade;
-    _sexo = inicial.sexo;
-    _fumante = inicial.fumante;
-    _diabetico = inicial.diabetico;
-    _pressaoSistolica = inicial.pressaoSistolica;
-    _usaRemedioPressao = inicial.usaRemedioPressao;
-    _colesterolTotal = inicial.colesterolTotal;
-    _hdl = inicial.hdl;
+    _preencherCom(inicial);
     _carregando = false;
     _avisar();
+  }
+
+  /// Começa uma avaliação nova do zero, com um novo código de paciente.
+  /// Usado quando o formulário é a primeira tela e uma avaliação acabou
+  /// de ser concluída.
+  Future<void> novaAvaliacao() async {
+    _temporizadorSalvamento?.cancel();
+    final nova = await _criarNova();
+    _modoEdicao = false;
+    _etapa = 1;
+    _erros = const [];
+    _rascunhoSalvo = false;
+    _preencherCom(nova);
+    _avisar();
+  }
+
+  /// Copia os dados de uma avaliação para o formulário.
+  void _preencherCom(AvaliacaoModel avaliacao) {
+    _base = avaliacao;
+    _idade = avaliacao.idade;
+    _sexo = avaliacao.sexo;
+    _fumante = avaliacao.fumante;
+    _diabetico = avaliacao.diabetico;
+    _pressaoSistolica = avaliacao.pressaoSistolica;
+    _usaRemedioPressao = avaliacao.usaRemedioPressao;
+    _colesterolTotal = avaliacao.colesterolTotal;
+    _hdl = avaliacao.hdl;
   }
 
   Future<AvaliacaoModel> _criarNova() async {

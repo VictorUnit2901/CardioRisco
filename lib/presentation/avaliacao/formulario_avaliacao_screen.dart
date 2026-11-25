@@ -63,6 +63,11 @@ class _FormularioViewState extends State<_FormularioView> {
     if (!mounted) {
       return;
     }
+    _preencherCampos(form);
+  }
+
+  /// Coloca nos campos de texto os números que estão no controlador.
+  void _preencherCampos(FormularioAvaliacaoController form) {
     _idade.text = form.idade?.toString() ?? '';
     _pressao.text = form.pressaoSistolica?.toString() ?? '';
     _colesterol.text = form.colesterolTotal?.toString() ?? '';
@@ -83,7 +88,7 @@ class _FormularioViewState extends State<_FormularioView> {
     form.avancar();
   }
 
-  void _avaliar(FormularioAvaliacaoController form) {
+  Future<void> _avaliar(FormularioAvaliacaoController form) async {
     FocusScope.of(context).unfocus();
     final avaliacao = form.avaliar();
     if (avaliacao == null) {
@@ -91,11 +96,27 @@ class _FormularioViewState extends State<_FormularioView> {
     }
     // Abre a Tela 3. O formulário continua aberto por baixo, então o
     // botão de voltar da Tela 3 permite corrigir alguma resposta.
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
+    final concluiu = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
         builder: (_) => ResultadoScreen(avaliacao: avaliacao),
       ),
     );
+    if (concluiu != true || !mounted) {
+      return;
+    }
+    // A avaliação foi concluída na Tela 4.
+    final navegador = Navigator.of(context);
+    if (navegador.canPop()) {
+      // Volta para a tela que abriu o formulário (home ou histórico).
+      navegador.pop(true);
+    } else {
+      // O formulário é a primeira tela (main de desenvolvimento):
+      // começa uma avaliação nova.
+      await form.novaAvaliacao();
+      if (mounted) {
+        _preencherCampos(form);
+      }
+    }
   }
 
   @override

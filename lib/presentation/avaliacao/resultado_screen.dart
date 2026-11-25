@@ -6,6 +6,7 @@ import '../../domain/models/enums_avaliacao.dart';
 import '../../domain/models/fator_risco.dart';
 import '../../domain/models/resultado_risco.dart';
 import '../../domain/services/identificador_fatores.dart';
+import 'recomendacoes_screen.dart';
 import 'widgets/cabecalho_avaliacao.dart';
 import 'widgets/estilo_risco.dart';
 import 'widgets/velocimetro.dart';
@@ -117,12 +118,17 @@ class ResultadoScreen extends StatelessWidget {
     );
   }
 
-  void _verOrientacoes(BuildContext context) {
-    // PROVISÓRIO: quando a Tela 4 (recomendações) existir, este botão
-    // vai abrir a Tela 4.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('A Tela 4 (recomendações) será ligada aqui.')),
+  /// Abre a Tela 4. Se a avaliação for concluída lá, esta tela também
+  /// fecha, avisando o formulário com `true`.
+  Future<void> _verOrientacoes(BuildContext context) async {
+    final concluiu = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => RecomendacoesScreen(avaliacao: avaliacao),
+      ),
     );
+    if (concluiu == true && context.mounted) {
+      Navigator.of(context).pop(true);
+    }
   }
 
   /// Explica de onde vem o número, para o profissional poder
