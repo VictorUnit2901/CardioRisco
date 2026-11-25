@@ -9,6 +9,7 @@
 - Painel "Saiba mais sobre o cálculo", com o modelo usado e as faixas de risco da SBC.
 - Cabeçalho das telas da avaliação no estilo do protótipo (`widgets/cabecalho_avaliacao.dart`).
 - 7 novos testes automatizados: fatores de risco, posição do ponteiro do velocímetro e Tela 3 (23 testes no total).
+- Ícone do app (coração com a linha de pulso, nas cores do tema escuro), gerado para todos os tamanhos do Android com o `flutter_launcher_icons` (`assets/icone/` e `flutter_launcher_icons.yaml`). O nome embaixo do ícone passa a ser "CardioRisco".
 
 ### Alterado
 
