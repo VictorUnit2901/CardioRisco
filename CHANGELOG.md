@@ -13,12 +13,14 @@
 - Tela 4 (recomendações): encaminhamento sugerido conforme o nível de risco e os fatores alterados, e recomendações de estilo de vida personalizadas ("Parar de fumar" só para fumantes e "Controle do diabetes" só para diabéticos), com explicação ao tocar em cada cartão (`Recomendacao` e `GeradorRecomendacoes`, em `lib/domain/`, e `recomendacoes_screen.dart`).
 - Botão "Concluir e voltar ao início": salva a avaliação na fila local, apaga o rascunho (só em avaliação nova), tenta enviar ao Firestore na hora com o `SyncService` e volta para a tela que abriu o formulário.
 - 7 novos testes automatizados: recomendações, Tela 4 e reinício do formulário (30 testes no total).
+- Teste de tela do formulário: sem respostas, a etapa 1 mostra os erros e não avança (31 testes no total).
 
 ### Alterado
 
 - `ResultadoRisco`: os limites das faixas (5%, 20% e 10%) viraram constantes (`limiteBaixo` e `limiteAlto`), usadas pela classificação e pelo velocímetro.
 - O botão "Avaliar risco" do formulário passa a abrir a Tela 3.
 - O botão "Ver orientações" da Tela 3 passa a abrir a Tela 4.
+- Telas 1 e 2 ajustadas ao protótipo de alta fidelidade: cabeçalho "CardioRisco", indicador de etapas com bolinhas numeradas, títulos em verde com subtítulo, ícones nas perguntas e nos campos, notas de rodapé da etapa 1 e caixa de dica da etapa 2.
 
 ## [24/11/2026]
 
