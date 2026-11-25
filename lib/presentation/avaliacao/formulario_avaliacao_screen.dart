@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../domain/models/avaliacao_model.dart';
 import '../../domain/models/enums_avaliacao.dart';
 import 'formulario_avaliacao_controller.dart';
+import 'resultado_screen.dart';
 import 'widgets/campo_numerico.dart';
 import 'widgets/indicador_etapas.dart';
 import 'widgets/rotulo_campo.dart';
@@ -62,6 +63,11 @@ class _FormularioViewState extends State<_FormularioView> {
     if (!mounted) {
       return;
     }
+    _preencherCampos(form);
+  }
+
+  /// Coloca nos campos de texto os números que estão no controlador.
+  void _preencherCampos(FormularioAvaliacaoController form) {
     _idade.text = form.idade?.toString() ?? '';
     _pressao.text = form.pressaoSistolica?.toString() ?? '';
     _colesterol.text = form.colesterolTotal?.toString() ?? '';
@@ -82,23 +88,35 @@ class _FormularioViewState extends State<_FormularioView> {
     form.avancar();
   }
 
-  void _avaliar(FormularioAvaliacaoController form) {
+  Future<void> _avaliar(FormularioAvaliacaoController form) async {
     FocusScope.of(context).unfocus();
     final avaliacao = form.avaliar();
-    final resultado = avaliacao?.resultado;
-    if (resultado == null) {
+    if (avaliacao == null) {
       return;
     }
-    // PROVISÓRIO: quando a Tela 3 (velocímetro) existir, esta mensagem
-    // será trocada pela navegação para ela.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Risco em 10 anos: ${resultado.percentualFormatado()} '
-          '(${resultado.nivel.rotulo}) - ${resultado.modelo}',
-        ),
+    // Abre a Tela 3. O formulário continua aberto por baixo, então o
+    // botão de voltar da Tela 3 permite corrigir alguma resposta.
+    final concluiu = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ResultadoScreen(avaliacao: avaliacao),
       ),
     );
+    if (concluiu != true || !mounted) {
+      return;
+    }
+    // A avaliação foi concluída na Tela 4.
+    final navegador = Navigator.of(context);
+    if (navegador.canPop()) {
+      // Volta para a tela que abriu o formulário (home ou histórico).
+      navegador.pop(true);
+    } else {
+      // O formulário é a primeira tela (main de desenvolvimento):
+      // começa uma avaliação nova.
+      await form.novaAvaliacao();
+      if (mounted) {
+        _preencherCampos(form);
+      }
+    }
   }
 
   @override
