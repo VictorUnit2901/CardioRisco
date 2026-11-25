@@ -1,0 +1,13 @@
+# Configuração do ícone do app, usada pelo pacote flutter_launcher_icons.
+# Para gerar os ícones de novo depois de trocar a imagem:
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: false
+  # Ícone completo (fundo escuro + coração), para Androids antigos.
+  image_path: "assets/icone/icone.png"
+  # Ícone adaptativo (Android 8+): cor de fundo + desenho transparente.
+  # O próprio celular recorta em círculo, quadrado etc.
+  adaptive_icon_background: "#0F141A"
+  adaptive_icon_foreground: "assets/icone/icone_frente.png"
+  min_sdk_android: 21
