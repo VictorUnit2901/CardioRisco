@@ -1,5 +1,20 @@
 # Changelog
 
+## [25/11/2026]
+
+### Adicionado
+
+- Tela 3 (resultado) com velocímetro desenhado com `CustomPainter`: o ponteiro anima até o percentual, e as faixas verde, amarela e vermelha seguem os limites da SBC para o sexo do paciente (`lib/presentation/avaliacao/resultado_screen.dart` e `widgets/velocimetro.dart`).
+- Lista "O que influencia seu risco?" com os fatores alterados nas respostas (`FatorRisco` e `IdentificadorFatores`, em `lib/domain/`), com explicação ao tocar em cada fator.
+- Painel "Saiba mais sobre o cálculo", com o modelo usado e as faixas de risco da SBC.
+- Cabeçalho das telas da avaliação no estilo do protótipo (`widgets/cabecalho_avaliacao.dart`).
+- 7 novos testes automatizados: fatores de risco, posição do ponteiro do velocímetro e Tela 3 (23 testes no total).
+
+### Alterado
+
+- `ResultadoRisco`: os limites das faixas (5%, 20% e 10%) viraram constantes (`limiteBaixo` e `limiteAlto`), usadas pela classificação e pelo velocímetro.
+- O botão "Avaliar risco" do formulário passa a abrir a Tela 3.
+
 ## [24/11/2026]
 
 ### Adicionado
