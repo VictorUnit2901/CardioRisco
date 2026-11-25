@@ -10,11 +10,15 @@
 - Cabeçalho das telas da avaliação no estilo do protótipo (`widgets/cabecalho_avaliacao.dart`).
 - 7 novos testes automatizados: fatores de risco, posição do ponteiro do velocímetro e Tela 3 (23 testes no total).
 - Ícone do app (coração com a linha de pulso, nas cores do tema escuro), gerado para todos os tamanhos do Android com o `flutter_launcher_icons` (`assets/icone/` e `flutter_launcher_icons.yaml`). O nome embaixo do ícone passa a ser "CardioRisco".
+- Tela 4 (recomendações): encaminhamento sugerido conforme o nível de risco e os fatores alterados, e recomendações de estilo de vida personalizadas ("Parar de fumar" só para fumantes e "Controle do diabetes" só para diabéticos), com explicação ao tocar em cada cartão (`Recomendacao` e `GeradorRecomendacoes`, em `lib/domain/`, e `recomendacoes_screen.dart`).
+- Botão "Concluir e voltar ao início": salva a avaliação na fila local, apaga o rascunho (só em avaliação nova), tenta enviar ao Firestore na hora com o `SyncService` e volta para a tela que abriu o formulário.
+- 7 novos testes automatizados: recomendações, Tela 4 e reinício do formulário (30 testes no total).
 
 ### Alterado
 
 - `ResultadoRisco`: os limites das faixas (5%, 20% e 10%) viraram constantes (`limiteBaixo` e `limiteAlto`), usadas pela classificação e pelo velocímetro.
 - O botão "Avaliar risco" do formulário passa a abrir a Tela 3.
+- O botão "Ver orientações" da Tela 3 passa a abrir a Tela 4.
 
 ## [24/11/2026]
 
