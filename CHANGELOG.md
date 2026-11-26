@@ -1,5 +1,12 @@
 # Changelog
 
+## [26/11/2026]
+
+### Adicionado
+
+- Integração ao app da home, do histórico, da comparação, da evolução, do dashboard e dos relatórios em PDF desenvolvidos pelo Erick (PR #16): os arquivos foram trazidos para `lib/` e `test/`, e o login passou a abrir a home.
+- Dependências `pdf` e `printing`, usadas pelos relatórios em PDF (geração do arquivo, prévia, impressão e compartilhamento).
+
 ## [25/11/2026]
 
 ### Adicionado
