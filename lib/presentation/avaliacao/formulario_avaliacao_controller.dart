@@ -66,6 +66,10 @@ class FormularioAvaliacaoController extends ChangeNotifier {
   Future<void> iniciar({AvaliacaoModel? avaliacaoExistente}) async {
     final AvaliacaoModel inicial;
     if (avaliacaoExistente != null) {
+      // Cede um instante antes de avisar a tela. Sem isso, o modo edição
+      // roda tudo de forma síncrona dentro do initState e o notifyListeners()
+      // redesenha a tela no meio da construção ("!_dirty is not true").
+      await Future<void>.delayed(Duration.zero);
       _modoEdicao = true;
       _etapa = 1;
       inicial = avaliacaoExistente;

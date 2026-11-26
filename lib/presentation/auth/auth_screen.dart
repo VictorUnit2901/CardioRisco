@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../data/remote/auth_service.dart';
 import '../../data/remote/sync_service.dart';
 import '../../domain/models/profissional_model.dart';
+import '../home/cardiorisco_home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -125,8 +126,11 @@ class _AuthScreenState extends State<AuthScreen> {
       if (!mounted) return;
 
       if (profissional != null) {
-        setState(() => _profissionalLogado = profissional);
         await _ativarSincronizacaoPosLogin();
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
+        );
       } else {
         _mostrarMensagem('Não foi possível concluir o acesso.');
       }
