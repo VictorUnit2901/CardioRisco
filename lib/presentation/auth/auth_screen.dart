@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/remote/auth_service.dart';
+import '../../data/remote/sync_service.dart';
 import '../../domain/models/profissional_model.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   final AuthService _authService = AuthService();
+  final SyncService _syncService = SyncService();
 
   bool _isCadastro = false;
   bool _obscurePassword = true;
@@ -30,6 +32,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   void dispose() {
+    _syncService.pararMonitoramentoAutomatico();
     _nomeController.dispose();
     _emailController.dispose();
     _senhaController.dispose();
@@ -61,6 +64,11 @@ class _AuthScreenState extends State<AuthScreen> {
       default:
         return e.message ?? 'Erro na autenticação (${e.code}).';
     }
+  }
+
+  Future<void> _ativarSincronizacaoPosLogin() async {
+    _syncService.iniciarMonitoramentoAutomatico();
+    await _syncService.sincronizarPendentes();
   }
 
   Future<void> _submeter() async {
@@ -118,6 +126,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
       if (profissional != null) {
         setState(() => _profissionalLogado = profissional);
+        await _ativarSincronizacaoPosLogin();
       } else {
         _mostrarMensagem('Não foi possível concluir o acesso.');
       }
@@ -176,6 +185,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       : () async {
                           setState(() => _isLoading = true);
                           try {
+                            _syncService.pararMonitoramentoAutomatico();
                             await _authService.logout();
                             if (!mounted) return;
                             setState(() => _profissionalLogado = null);
