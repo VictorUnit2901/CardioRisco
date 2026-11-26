@@ -1,4 +1,45 @@
-# Changelog
+## Changelog
+
+## [26/11/2026]
+
+## Adicionado
+
+- Home (lib/presentation/home/cardiorisco_home_screen.dart): logo do CardioRisco, resumo com avaliações, pacientes e pacientes em alto risco, três últimas avaliações, botão "Nova avaliação" (vira "Continuar avaliação em andamento" quando há rascunho), atalhos para as telas de acompanhamento, atualizar, sair da conta e aviso de avaliações aguardando envio. Abre o formulário com FormularioAvaliacaoScreen() e só atualiza os números quando ele devolve true.
+- Histórico completo (lib/presentation/historico/historico_screen.dart): lista das avaliações do aparelho, busca por código do paciente, filtro por nível de risco, ícone do status de envio, ver detalhes, editar pelo formulário (FormularioAvaliacaoScreen(avaliacao: x)) e excluir com confirmação.
+- Tela de detalhes da avaliação (detalhe_avaliacao_screen.dart): dados pessoais e clínicos, resultado, editar, excluir e gerar o PDF da avaliação.
+- Comparação entre avaliações (lib/presentation/comparacao/comparacao_screen.dart): duas avaliações do mesmo paciente lado a lado, com a variação do risco em pontos percentuais e a mudança de cada fator (pressão, colesterol, HDL, tabagismo, diabetes e remédio para pressão).
+- Gráfico de evolução (lib/presentation/evolucao/evolucao_screen.dart e shared/grafico_evolucao.dart): risco do paciente ao longo das avaliações, desenhado com CustomPainter, com eixos, datas e as faixas de risco da SBC conforme o sexo.
+- Dashboard do ACS (lib/presentation/dashboard/dashboard_screen.dart e shared/grafico_rosca.dart): gráficos de rosca de nível de risco, tabagismo, diabetes, remédio para pressão e sexo, além da lista de pacientes em alto risco.
+- Relatórios epidemiológicos agregados (lib/presentation/relatorios/relatorios_screen.dart): filtro de período (todo o período, 30 ou 90 dias), classificação de risco, fatores de risco, faixa etária e médias clínicas, sem identificar pacientes.
+- Relatório em PDF (lib/domain/services/relatorio_pdf_service.dart e relatorios/pdf_preview_screen.dart): relatório agregado e relatório individual da avaliação, com pré-visualização, compartilhamento e impressão.
+- IndicadoresService (lib/domain/services/indicadores_service.dart): cálculo dos indicadores agregados. Cada paciente conta uma vez, pela avaliação mais recente, e rascunhos ficam de fora.
+- CardioRiscoRepository (lib/data/local/cardiorisco_repository.dart): leitura das avaliações pelo LocalStorageService, ordenação, filtro por profissional e exclusão local.
+- Funções de formatação de datas, números e percentuais em português (lib/core/utils/formatadores.dart).
+- Componentes compartilhados das telas de acompanhamento: cartões de métrica, linhas de informação, estado vazio, carregador de avaliações e cores por nível de risco (lib/presentation/shared/).
+- A home liga o monitoramento do SyncService ao abrir e o desliga ao fechar, porque o AuthScreen encerra o dele quando a tela é substituída.
+- 8 novos testes automatizados: indicadores agregados (paciente contado uma vez, filtro por período, faixa etária, classificação por sexo) e geração dos PDFs (test/domain/indicadores_service_test.dart).
+- Dependências pdf e printing no pubspec.yaml.
+- Documento PlanejamentoCardioRisco e ApresentaçãoPlanejamento 
+
+## Alterado
+
+- AuthScreen: depois do login, e da ativação da sincronização, abre a home (CardioHomeScreen) em vez de mostrar a tela provisória.
+- Gráfico de evolução e tela de evolução usam ResultadoRisco.limiteBaixo e ResultadoRisco.limiteAlto, em vez de repetir os limites das faixas.
+- Diagrama de caso de uso (docs/diagramaCasodeUso.md) atualizado para as regras da Unidade II, com os casos de uso organizados em cinco grupos:
+  - Acesso: criar conta, fazer login e recuperar senha.
+  - Avaliação: continuar avaliação em andamento, salvamento automático e "usa remédio para pressão" nos dados clínicos.
+  - Histórico: buscar e filtrar, ver detalhes, editar com registro de auditoria, excluir, ver evolução e comparação e exportar PDF.
+  - Painel: ver indicadores, gerar relatório em PDF e relatório da equipe.
+  - Conta: ver dados, política de privacidade, envio somente por Wi-Fi, excluir dados definitivamente e sair.
+- Diagrama de caso de uso: novo ator geral "Profissional de saúde" (ACS, Enfermeiro e Médico), relatório da equipe ligado somente ao Enfermeiro e ao Médico, matriz de acesso por área, legenda de cores e diagrama redesenhado, com ligações dos atores até os casos de uso, fonte maior e mais contraste.
+- Regras de negócio do caso de uso: "quando houver internet" trocado por "quando houver Wi-Fi" e removida a restrição de "no máximo quatro telas principais", que era da Unidade I.
+- Fluxo de navegação (docs/FluxodeNavegação.md): nova decisão "Já está logado?" depois de "Abrir aplicativo" (o login só é pedido no primeiro acesso).
+- Fluxo de navegação: no Painel, o ACS permanece na tela e apenas não vê o botão "Relatório da equipe", visível para enfermeiro e médico.
+- Fluxo de navegação: a avaliação em andamento retoma na etapa em que parou (dados pessoais ou dados clínicos), com a nova decisão "Em que etapa parou?".
+
+## Corrigido
+
+- Formulário de avaliação em modo edição (FormularioAvaliacaoController.iniciar): o aviso à tela acontecia durante a construção dela e causava o erro !_dirty is not true ao editar pelo histórico.
 
 ## [25/11/2026]
 
