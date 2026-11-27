@@ -2,6 +2,12 @@
 
 ## [27/11/2026]
 
+### Adicionado
+
+- Segundo modelo de risco: Escore de Risco Global da SBC pela tabela de pontos (`CalculadoraErgSbc`, em `lib/domain/services/`), com as Tabelas IV a VII da V Diretriz Brasileira de Dislipidemias e Prevenção da Aterosclerose (SBC, 2013). Segue a mesma interface `CalculadoraRisco` do modelo de Framingham.
+- Tela 3: cartão "Pela tabela de pontos da SBC", que mostra o resultado do segundo modelo para comparação com o velocímetro, e explicação dos dois modelos no painel "Saiba mais sobre o cálculo".
+- 6 novos testes automatizados do modelo ERG/SBC e conferência do cartão na Tela 3 (45 testes no total).
+
 ### Corrigido
 
 - Tela 4: o botão "Concluir" passa a chamar `SyncService.sincronizarTudo()` em vez de `sincronizarPendentes()`, que depois da mudança no `SyncService` deixou de conferir a regra de enviar só no Wi-Fi e de evitar duas sincronizações ao mesmo tempo.

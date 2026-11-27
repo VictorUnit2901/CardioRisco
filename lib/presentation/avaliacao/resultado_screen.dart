@@ -5,6 +5,7 @@ import '../../domain/models/avaliacao_model.dart';
 import '../../domain/models/enums_avaliacao.dart';
 import '../../domain/models/fator_risco.dart';
 import '../../domain/models/resultado_risco.dart';
+import '../../domain/services/calculadora_erg_sbc.dart';
 import '../../domain/services/identificador_fatores.dart';
 import 'recomendacoes_screen.dart';
 import 'widgets/cabecalho_avaliacao.dart';
@@ -91,6 +92,8 @@ class ResultadoScreen extends StatelessWidget {
                 const _SemFatores()
               else
                 for (final fator in fatores) _ItemFator(fator: fator),
+              const SizedBox(height: 16),
+              _CartaoOutroModelo(avaliacao: avaliacao),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => _verOrientacoes(context),
@@ -172,6 +175,14 @@ class ResultadoScreen extends StatelessWidget {
                 'próximos 10 anos.',
                 style: TextStyle(fontSize: 15, height: 1.4),
               ),
+              const SizedBox(height: 12),
+              const Text(
+                'O app também calcula pela tabela de pontos do Escore de '
+                'Risco Global (a versão em papel usada nas UBS) e mostra o '
+                'resultado para comparação. Como a tabela arredonda os '
+                'valores, os dois números podem ser um pouco diferentes.',
+                style: TextStyle(fontSize: 15, height: 1.4),
+              ),
               const SizedBox(height: 16),
               Text(
                 'Faixas da SBC para $publico',
@@ -229,6 +240,80 @@ class _SeloNivel extends StatelessWidget {
               color: AppTheme.background,
               fontSize: 16,
               fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Resultado do segundo modelo (tabela de pontos do ERG/SBC), para
+/// comparar com a equação de Framingham do velocímetro.
+class _CartaoOutroModelo extends StatelessWidget {
+  const _CartaoOutroModelo({required this.avaliacao});
+
+  final AvaliacaoModel avaliacao;
+
+  @override
+  Widget build(BuildContext context) {
+    ResultadoRisco? erg;
+    try {
+      erg = const CalculadoraErgSbc().calcular(avaliacao);
+    } on ArgumentError {
+      erg = null;
+    }
+    if (erg == null) {
+      return const SizedBox.shrink();
+    }
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.surfaceVariant),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.compare_arrows, color: AppTheme.textSecondary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Pela tabela de pontos da SBC',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: CalculadoraErgSbc.formatarPercentual(
+                          erg.percentual,
+                        ),
+                        style: TextStyle(
+                          color: erg.nivel.cor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' · risco ${erg.nivel.rotulo.toLowerCase()}',
+                      ),
+                    ],
+                  ),
+                  style: const TextStyle(fontSize: 15),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'O velocímetro usa a equação de Framingham, que é mais '
+                  'precisa. A tabela de pontos é a versão em papel do mesmo '
+                  'escore e pode dar um valor um pouco diferente.',
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                ),
+              ],
             ),
           ),
         ],
