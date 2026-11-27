@@ -32,6 +32,22 @@ class _AuthScreenState extends State<AuthScreen> {
   ProfissionalModel? _profissionalLogado;
 
   @override
+  void initState() {
+    super.initState();
+    _carregarSessaoSalva();
+  }
+
+  Future<void> _carregarSessaoSalva() async {
+    final salvo = await _authService.obterProfissionalSalvo();
+    if (!mounted || salvo == null) return;
+    setState(() {
+      if (_emailController.text.trim().isEmpty && salvo.email.isNotEmpty) {
+        _emailController.text = salvo.email;
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _syncService.pararMonitoramentoAutomatico();
     _nomeController.dispose();
@@ -57,7 +73,7 @@ class _AuthScreenState extends State<AuthScreen> {
       case 'invalid-credential':
         return 'E-mail ou senha incorretos.';
       case 'email-already-in-use':
-        return 'Este e-mail já está cadastrado.';
+        return 'Este e-mail já está cadastrado. Entre com sua conta.';
       case 'weak-password':
         return 'A senha deve ter pelo menos 8 caracteres.';
       case 'network-request-failed':
@@ -67,9 +83,15 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  Future<void> _ativarSincronizacaoPosLogin() async {
-    _syncService.iniciarMonitoramentoAutomatico();
-    await _syncService.sincronizarPendentes();
+  Future<void> _ativarSincronizacaoPosLogin(String? profissionalId) async {
+    _syncService.iniciarMonitoramentoAutomatico(profissionalId: profissionalId);
+    try {
+      await _syncService
+          .sincronizarTudo(profissionalId: profissionalId)
+          .timeout(const Duration(seconds: 6));
+    } catch (_) {
+      // Sem internet, as avaliações permanecem na fila local até reconectar
+    }
   }
 
   Future<void> _submeter() async {
@@ -82,12 +104,12 @@ class _AuthScreenState extends State<AuthScreen> {
       _mostrarMensagem('Informe seu e-mail profissional.');
       return;
     }
-    if (senha.isEmpty) {
-      _mostrarMensagem('Informe sua senha.');
-      return;
-    }
 
     if (_isCadastro) {
+      if (senha.isEmpty) {
+        _mostrarMensagem('Informe sua senha.');
+        return;
+      }
       if (_nomeController.text.trim().isEmpty) {
         _mostrarMensagem('Informe o nome do profissional.');
         return;
@@ -100,6 +122,24 @@ class _AuthScreenState extends State<AuthScreen> {
         _mostrarMensagem('Aceite a Política de Privacidade para continuar.');
         return;
       }
+    } else if (senha.isEmpty) {
+      final salvo = await _authService.entrarOffline(email: email);
+      if (salvo != null && mounted) {
+        setState(() => _isLoading = true);
+        try {
+          await _ativarSincronizacaoPosLogin(salvo.uid);
+          if (!mounted) return;
+          _mostrarMensagem('Sem internet: acessando conta salva localmente.');
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
+          );
+          return;
+        } finally {
+          if (mounted) setState(() => _isLoading = false);
+        }
+      }
+      _mostrarMensagem('Informe sua senha.');
+      return;
     }
 
     setState(() => _isLoading = true);
@@ -126,7 +166,7 @@ class _AuthScreenState extends State<AuthScreen> {
       if (!mounted) return;
 
       if (profissional != null) {
-        await _ativarSincronizacaoPosLogin();
+        await _ativarSincronizacaoPosLogin(profissional.uid);
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
@@ -135,8 +175,32 @@ class _AuthScreenState extends State<AuthScreen> {
         _mostrarMensagem('Não foi possível concluir o acesso.');
       }
     } on FirebaseAuthException catch (e) {
+      if (!_isCadastro && e.code == 'network-request-failed') {
+        final offline = await _authService.entrarOffline(email: email);
+        if (offline != null && mounted) {
+          await _ativarSincronizacaoPosLogin(offline.uid);
+          if (!mounted) return;
+          _mostrarMensagem('Sem internet: acessando conta salva localmente.');
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
+          );
+          return;
+        }
+      }
       _mostrarMensagem(_mensagemErroAuth(e));
     } catch (e) {
+      if (!_isCadastro) {
+        final offline = await _authService.entrarOffline(email: email);
+        if (offline != null && mounted) {
+          await _ativarSincronizacaoPosLogin(offline.uid);
+          if (!mounted) return;
+          _mostrarMensagem('Sem internet: acessando conta salva localmente.');
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
+          );
+          return;
+        }
+      }
       _mostrarMensagem('Erro inesperado ao autenticar: $e');
     } finally {
       if (mounted) {

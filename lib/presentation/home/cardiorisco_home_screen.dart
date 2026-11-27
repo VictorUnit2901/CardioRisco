@@ -40,14 +40,18 @@ class _CardioHomeScreenState extends State<CardioHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _carregar();
-    _iniciarSincronizacao();
+    _inicializarTela();
   }
 
   @override
   void dispose() {
     _sync?.pararMonitoramentoAutomatico();
     super.dispose();
+  }
+
+  Future<void> _inicializarTela() async {
+    await _carregar();
+    await _iniciarSincronizacao();
   }
 
   Future<void> _carregar() async {
@@ -68,21 +72,40 @@ class _CardioHomeScreenState extends State<CardioHomeScreen> {
     });
   }
 
-  /// Envia as avaliações pendentes quando há Wi-Fi. Se falhar (sem rede,
-  /// Firebase indisponível), o app segue funcionando offline.
+  Future<void> _atualizarManualmente() async {
+    await _carregar();
+    try {
+      final p = await _repo.profissionalAtual();
+      final sync = _sync ?? SyncService();
+      _sync = sync;
+      await sync.sincronizarTudo(profissionalId: p?.uid);
+      if (mounted) await _carregar();
+    } catch (_) {
+      // Mantém dados locais se estiver sem rede
+    }
+  }
+
+  /// Sincroniza pendentes e recupera avaliações da nuvem quando há conexão
+  /// liberada. Se falhar (sem rede, Firebase indisponível), o app segue
+  /// funcionando offline.
   Future<void> _iniciarSincronizacao() async {
     try {
+      final p = await _repo.profissionalAtual();
+      final uid = p?.uid;
+
       final sync = SyncService();
       _sync = sync;
-      sync.iniciarMonitoramentoAutomatico();
-      final enviadas = await sync.sincronizarPendentes();
-      if (enviadas > 0) await _carregar();
+      sync.iniciarMonitoramentoAutomatico(profissionalId: uid);
+
+      await sync.sincronizarTudo(profissionalId: uid);
+      if (mounted) await _carregar();
     } catch (_) {
       // Fica na fila e tenta de novo na próxima mudança de conexão.
     }
   }
 
   Future<void> _sair() async {
+    _sync?.pararMonitoramentoAutomatico();
     await AuthService().logout();
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
@@ -117,116 +140,120 @@ class _CardioHomeScreenState extends State<CardioHomeScreen> {
     return Scaffold(
       body: SafeArea(
         child: _carregando
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _carregar,
-              child: ListView(
-                padding: const EdgeInsets.all(18),
-                children: [
-                  // Logo da marca (a mesma das telas da avaliação) e ações.
-                  Row(
-                    children: [
-                      const Expanded(child: CabecalhoAvaliacao()),
-                      IconButton(
-                        tooltip: 'Atualizar',
-                        onPressed: _carregar,
-                        icon: const Icon(Icons.refresh),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair da conta',
-                        onPressed: _sair,
-                        icon: const Icon(Icons.logout),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text('Olá, $_nome',
-                      style: Theme.of(context).textTheme.headlineSmall),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'Acompanhamento do risco cardiovascular em 10 anos',
-                    style: TextStyle(color: AppTheme.textSecondary),
-                  ),
-                  const SizedBox(height: 20),
-                  MetricGrid(itens: [
-                    Metrica('Avaliações', '${_itens.length}',
-                        Icons.assignment_outlined),
-                    Metrica('Pacientes', '${ind.totalPacientes}',
-                        Icons.people_outline),
-                    Metrica('Alto risco', '${ind.altoRisco}',
-                        Icons.warning_amber,
-                        cor: ind.altoRisco > 0
-                            ? AppTheme.dangerRed
-                            : AppTheme.primaryGreen),
-                  ]),
-                  if (pendentes > 0) ...[
-                    const SizedBox(height: 10),
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(
+                onRefresh: _atualizarManualmente,
+                child: ListView(
+                  padding: const EdgeInsets.all(18),
+                  children: [
+                    // Logo da marca (a mesma das telas da avaliação) e ações.
                     Row(
                       children: [
-                        const Icon(Icons.cloud_upload_outlined,
-                            size: 16, color: AppTheme.textSecondary),
-                        const SizedBox(width: 6),
-                        Text('$pendentes aguardando envio (Wi-Fi)',
-                            style: const TextStyle(
-                                fontSize: 12, color: AppTheme.textSecondary)),
+                        const Expanded(child: CabecalhoAvaliacao()),
+                        IconButton(
+                          tooltip: 'Atualizar',
+                          onPressed: _atualizarManualmente,
+                          icon: const Icon(Icons.refresh),
+                        ),
+                        IconButton(
+                          tooltip: 'Sair da conta',
+                          onPressed: _sair,
+                          icon: const Icon(Icons.logout),
+                        ),
                       ],
                     ),
-                  ],
-                  const SizedBox(height: 20),
-                  // Avaliação nova. Se existir rascunho, o formulário o retoma.
-                  ElevatedButton.icon(
-                    onPressed: _novaAvaliacao,
-                    icon: Icon(_temRascunho ? Icons.play_arrow : Icons.add),
-                    label: Text(_temRascunho
-                        ? 'CONTINUAR AVALIAÇÃO EM ANDAMENTO'
-                        : 'NOVA AVALIAÇÃO'),
-                  ),
-                  const SizedBox(height: 22),
-                  if (recentes.isNotEmpty) ...[
-                    const TituloSecao('Últimas avaliações'),
-                    for (final a in recentes) _Recente(a: a, onTap: () =>
-                        _abrir(DetalheAvaliacaoScreen(avaliacao: a))),
-                    const SizedBox(height: 14),
-                  ] else ...[
-                    const EstadoVazio(
-                      'Nenhuma avaliação concluída ainda. Toque em "Nova avaliação" para começar.',
-                      icone: Icons.favorite_border,
+                    const SizedBox(height: 20),
+                    Text('Olá, $_nome',
+                        style: Theme.of(context).textTheme.headlineSmall),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Acompanhamento do risco cardiovascular em 10 anos',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
+                    const SizedBox(height: 20),
+                    MetricGrid(itens: [
+                      Metrica('Avaliações', '${_itens.length}',
+                          Icons.assignment_outlined),
+                      Metrica('Pacientes', '${ind.totalPacientes}',
+                          Icons.people_outline),
+                      Metrica('Alto risco', '${ind.altoRisco}',
+                          Icons.warning_amber,
+                          cor: ind.altoRisco > 0
+                              ? AppTheme.dangerRed
+                              : AppTheme.primaryGreen),
+                    ]),
+                    if (pendentes > 0) ...[
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(Icons.cloud_upload_outlined,
+                              size: 16, color: AppTheme.textSecondary),
+                          const SizedBox(width: 6),
+                          Text('$pendentes aguardando envio (Wi-Fi)',
+                              style: const TextStyle(
+                                  fontSize: 12, color: AppTheme.textSecondary)),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: 20),
+                    // Avaliação nova. Se existir rascunho, o formulário o retoma.
+                    ElevatedButton.icon(
+                      onPressed: _novaAvaliacao,
+                      icon: Icon(_temRascunho ? Icons.play_arrow : Icons.add),
+                      label: Text(_temRascunho
+                          ? 'CONTINUAR AVALIAÇÃO EM ANDAMENTO'
+                          : 'NOVA AVALIAÇÃO'),
+                    ),
+                    const SizedBox(height: 22),
+                    if (recentes.isNotEmpty) ...[
+                      const TituloSecao('Últimas avaliações'),
+                      for (final a in recentes)
+                        _Recente(
+                          a: a,
+                          onTap: () =>
+                              _abrir(DetalheAvaliacaoScreen(avaliacao: a)),
+                        ),
+                      const SizedBox(height: 14),
+                    ] else ...[
+                      const EstadoVazio(
+                        'Nenhuma avaliação concluída ainda. Toque em "Nova avaliação" para começar.',
+                        icone: Icons.favorite_border,
+                      ),
+                    ],
+                    const TituloSecao('Acompanhamento'),
+                    AtalhoTile(
+                      icone: Icons.history,
+                      titulo: 'Histórico completo',
+                      subtitulo: 'Consultar, editar e excluir avaliações',
+                      onTap: () => _abrir(const HistoricoScreen()),
+                    ),
+                    AtalhoTile(
+                      icone: Icons.compare_arrows,
+                      titulo: 'Comparar avaliações',
+                      subtitulo: 'Duas avaliações do mesmo paciente',
+                      onTap: () => _abrir(const ComparacaoScreen()),
+                    ),
+                    AtalhoTile(
+                      icone: Icons.show_chart,
+                      titulo: 'Gráfico de evolução',
+                      subtitulo: 'Risco do paciente ao longo do tempo',
+                      onTap: () => _abrir(const EvolucaoScreen()),
+                    ),
+                    AtalhoTile(
+                      icone: Icons.donut_large,
+                      titulo: 'Dashboard do ACS',
+                      subtitulo: 'Indicadores e fatores de risco',
+                      onTap: () => _abrir(const DashboardScreen()),
+                    ),
+                    AtalhoTile(
+                      icone: Icons.analytics_outlined,
+                      titulo: 'Relatórios epidemiológicos',
+                      subtitulo: 'Dados agregados e relatório em PDF',
+                      onTap: () => _abrir(const RelatoriosScreen()),
                     ),
                   ],
-                  const TituloSecao('Acompanhamento'),
-                  AtalhoTile(
-                    icone: Icons.history,
-                    titulo: 'Histórico completo',
-                    subtitulo: 'Consultar, editar e excluir avaliações',
-                    onTap: () => _abrir(const HistoricoScreen()),
-                  ),
-                  AtalhoTile(
-                    icone: Icons.compare_arrows,
-                    titulo: 'Comparar avaliações',
-                    subtitulo: 'Duas avaliações do mesmo paciente',
-                    onTap: () => _abrir(const ComparacaoScreen()),
-                  ),
-                  AtalhoTile(
-                    icone: Icons.show_chart,
-                    titulo: 'Gráfico de evolução',
-                    subtitulo: 'Risco do paciente ao longo do tempo',
-                    onTap: () => _abrir(const EvolucaoScreen()),
-                  ),
-                  AtalhoTile(
-                    icone: Icons.donut_large,
-                    titulo: 'Dashboard do ACS',
-                    subtitulo: 'Indicadores e fatores de risco',
-                    onTap: () => _abrir(const DashboardScreen()),
-                  ),
-                  AtalhoTile(
-                    icone: Icons.analytics_outlined,
-                    titulo: 'Relatórios epidemiológicos',
-                    subtitulo: 'Dados agregados e relatório em PDF',
-                    onTap: () => _abrir(const RelatoriosScreen()),
-                  ),
-                ],
+                ),
               ),
-            ),
       ),
     );
   }

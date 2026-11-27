@@ -23,6 +23,11 @@ class LocalStorageService {
     return ProfissionalModel.fromMap(jsonDecode(raw) as Map<String, dynamic>);
   }
 
+  Future<void> limparProfissional() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyProfissional);
+  }
+
   // --- Preferência de Wi-Fi ---
   Future<void> definirApenasWifi(bool apenasWifi) async {
     final prefs = await SharedPreferences.getInstance();
@@ -31,7 +36,7 @@ class LocalStorageService {
 
   Future<bool> obterApenasWifi() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_keyApenasWifi) ?? true; // Padrão: enviar apenas por Wi-Fi
+    return prefs.getBool(_keyApenasWifi) ?? true;
   }
 
   // --- Geração de código anônimo (P-0001, P-0002...) ---
@@ -47,10 +52,12 @@ class LocalStorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
       _keyRascunhoAvaliacao,
-      rascunho.copyWith(
-        statusSync: StatusSincronizacao.rascunho,
-        atualizadoEm: DateTime.now(),
-      ).toJson(),
+      rascunho
+          .copyWith(
+            statusSync: StatusSincronizacao.rascunho,
+            atualizadoEm: DateTime.now(),
+          )
+          .toJson(),
     );
   }
 
@@ -73,8 +80,15 @@ class LocalStorageService {
     return listaRaw.map((item) => AvaliacaoModel.fromJson(item)).toList();
   }
 
-  Future<void> salvarAvaliacaoNaFila(AvaliacaoModel avaliacao) async {
+  Future<void> salvarAvaliacoesLocais(List<AvaliacaoModel> avaliacoes) async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      _keyAvaliacoesLocais,
+      avaliacoes.map((a) => a.toJson()).toList(),
+    );
+  }
+
+  Future<void> salvarAvaliacaoNaFila(AvaliacaoModel avaliacao) async {
     final atuais = await obterAvaliacoesLocais();
 
     final itemPreparado = avaliacao.copyWith(
@@ -89,10 +103,7 @@ class LocalStorageService {
       atuais.add(itemPreparado);
     }
 
-    await prefs.setStringList(
-      _keyAvaliacoesLocais,
-      atuais.map((a) => a.toJson()).toList(),
-    );
+    await salvarAvaliacoesLocais(atuais);
   }
 
   Future<List<AvaliacaoModel>> obterPendentesSincronizacao() async {
@@ -103,7 +114,6 @@ class LocalStorageService {
   }
 
   Future<void> marcarComoSincronizada(String idAvaliacao) async {
-    final prefs = await SharedPreferences.getInstance();
     final atuais = await obterAvaliacoesLocais();
 
     final atualizadas = atuais.map((a) {
@@ -116,10 +126,48 @@ class LocalStorageService {
       return a;
     }).toList();
 
-    await prefs.setStringList(
-      _keyAvaliacoesLocais,
-      atualizadas.map((a) => a.toJson()).toList(),
-    );
+    await salvarAvaliacoesLocais(atualizadas);
+  }
+
+  /// Mescla avaliações recuperadas do Firestore com as avaliações locais
+  /// sem criar duplicatas (chaveada por `id`).
+  /// Se o item local ainda estiver como `pendenteEnvio`, preserva a versão local
+  /// para que ela seja enviada antes de ser sobrescrita.
+  Future<void> mesclarAvaliacoesRemotas(
+    List<AvaliacaoModel> remotas, {
+    String? profissionalId,
+  }) async {
+    final atuais = await obterAvaliacoesLocais();
+    final porId = <String, AvaliacaoModel>{
+      for (final item in atuais)
+        if (item.id.isNotEmpty) item.id: item,
+    };
+
+    for (final remota in remotas) {
+      if (remota.id.isEmpty) continue;
+      if (profissionalId != null &&
+          profissionalId.isNotEmpty &&
+          remota.profissionalId.isNotEmpty &&
+          remota.profissionalId != profissionalId) {
+        continue;
+      }
+
+      final localExistente = porId[remota.id];
+      if (localExistente != null &&
+          localExistente.statusSync == StatusSincronizacao.pendenteEnvio) {
+        continue;
+      }
+
+      final normalizada = remota.copyWith(
+        statusSync: StatusSincronizacao.sincronizado,
+      );
+      porId[remota.id] = normalizada;
+    }
+
+    final resultado = porId.values.toList()
+      ..sort((a, b) => b.dataHora.compareTo(a.dataHora));
+
+    await salvarAvaliacoesLocais(resultado);
   }
 
   // --- Exclusão definitiva dos dados locais ---
