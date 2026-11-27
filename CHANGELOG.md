@@ -1,5 +1,11 @@
 ## Changelog
 
+## [27/11/2026]
+
+### Corrigido
+
+- Tela 4: o botão "Concluir" passa a chamar `SyncService.sincronizarTudo()` em vez de `sincronizarPendentes()`, que depois da mudança no `SyncService` deixou de conferir a regra de enviar só no Wi-Fi e de evitar duas sincronizações ao mesmo tempo.
+
 ## [26/11/2026]
 
 ## Adicionado

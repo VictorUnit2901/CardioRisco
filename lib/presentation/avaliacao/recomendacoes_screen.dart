@@ -91,7 +91,11 @@ class _RecomendacoesScreenState extends State<RecomendacoesScreen> {
       if (enviar != null) {
         await enviar();
       } else {
-        await SyncService().sincronizarPendentes();
+        // sincronizarTudo respeita a regra de enviar só no Wi-Fi e não
+        // roda duas sincronizações ao mesmo tempo.
+        await SyncService().sincronizarTudo(
+          profissionalId: widget.avaliacao.profissionalId,
+        );
       }
     } catch (_) {
       // Sem Firebase, sem login ou sem rede: a avaliação continua na fila
