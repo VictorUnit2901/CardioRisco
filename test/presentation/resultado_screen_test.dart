@@ -59,5 +59,7 @@ void main() {
     expect(find.text('Pressão arterial elevada'), findsOneWidget);
     expect(find.text('Colesterol acima do ideal'), findsOneWidget);
     expect(find.text('Idade'), findsOneWidget);
+    // Segundo modelo: tabela de pontos da SBC (14 pontos = 18,4%).
+    expect(find.textContaining('18,4%'), findsOneWidget);
   });
 }
