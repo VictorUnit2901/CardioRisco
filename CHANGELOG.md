@@ -1,4 +1,4 @@
-## Changelog
+# Changelog
 
 ## [27/11/2026]
 
@@ -8,13 +8,22 @@
 - Tela 3: cartão "Pela tabela de pontos da SBC", que mostra o resultado do segundo modelo para comparação com o velocímetro, e explicação dos dois modelos no painel "Saiba mais sobre o cálculo".
 - 6 novos testes automatizados do modelo ERG/SBC e conferência do cartão na Tela 3 (45 testes no total).
 
+### Alterado
+
+- Diagrama de classes (`docs/diagramaClasses.md`) atualizado com as classes reais do código (domínio, dados e apresentação), as regras de negócio implementadas e uma tabela com as mudanças em relação à primeira versão.
+- Escolhas de interface (`docs/escolhasInterface.md`): nova seção 25 com as decisões visuais da Unidade II (tema escuro, formulário em etapas, velocímetro, explicação do resultado, recomendações e ícone) e remoção de marcas de citação quebradas (`:contentReference[...]`) que tinham ficado no texto.
+- Pesquisa (`docs/pesquisa.md`): nova seção 2.4 com os modelos de cálculo adotados (equação de Framingham e tabela de pontos do ERG/SBC), a classificação, os limites dos fatores de risco e os limites do projeto, e novas fontes (6 a 11).
+- Registro de uso de IA (`docs/uso-de-ia.md`): título e introdução gerais do documento e a parte do Victor (prompts, erros da IA e soluções, justificativa das bibliotecas `provider`, `flutter_launcher_icons`, `pdf` e `printing`).
+- README: seção "Como executar" e responsabilidades da Unidade II.
+- CHANGELOG: títulos padronizados (`#` no título, `###` nas seções) e as duas entradas de 26/11 juntadas em uma só, sem mudar o texto dos itens.
+
 ### Corrigido
 
 - Tela 4: o botão "Concluir" passa a chamar `SyncService.sincronizarTudo()` em vez de `sincronizarPendentes()`, que depois da mudança no `SyncService` deixou de conferir a regra de enviar só no Wi-Fi e de evitar duas sincronizações ao mesmo tempo.
 
 ## [26/11/2026]
 
-## Adicionado
+### Adicionado
 
 - Home (lib/presentation/home/cardiorisco_home_screen.dart): logo do CardioRisco, resumo com avaliações, pacientes e pacientes em alto risco, três últimas avaliações, botão "Nova avaliação" (vira "Continuar avaliação em andamento" quando há rascunho), atalhos para as telas de acompanhamento, atualizar, sair da conta e aviso de avaliações aguardando envio. Abre o formulário com FormularioAvaliacaoScreen() e só atualiza os números quando ele devolve true.
 - Histórico completo (lib/presentation/historico/historico_screen.dart): lista das avaliações do aparelho, busca por código do paciente, filtro por nível de risco, ícone do status de envio, ver detalhes, editar pelo formulário (FormularioAvaliacaoScreen(avaliacao: x)) e excluir com confirmação.
@@ -32,8 +41,10 @@
 - 8 novos testes automatizados: indicadores agregados (paciente contado uma vez, filtro por período, faixa etária, classificação por sexo) e geração dos PDFs (test/domain/indicadores_service_test.dart).
 - Dependências pdf e printing no pubspec.yaml.
 - Documento PlanejamentoCardioRisco e ApresentaçãoPlanejamento 
+- Integração ao app da home, do histórico, da comparação, da evolução, do dashboard e dos relatórios em PDF desenvolvidos pelo Erick (PR #16): os arquivos foram trazidos para `lib/` e `test/`, e o login passou a abrir a home.
+- Dependências `pdf` e `printing`, usadas pelos relatórios em PDF (geração do arquivo, prévia, impressão e compartilhamento).
 
-## Alterado
+### Alterado
 
 - AuthScreen: depois do login, e da ativação da sincronização, abre a home (CardioHomeScreen) em vez de mostrar a tela provisória.
 - Gráfico de evolução e tela de evolução usam ResultadoRisco.limiteBaixo e ResultadoRisco.limiteAlto, em vez de repetir os limites das faixas.
@@ -49,16 +60,9 @@
 - Fluxo de navegação: no Painel, o ACS permanece na tela e apenas não vê o botão "Relatório da equipe", visível para enfermeiro e médico.
 - Fluxo de navegação: a avaliação em andamento retoma na etapa em que parou (dados pessoais ou dados clínicos), com a nova decisão "Em que etapa parou?".
 
-## Corrigido
+### Corrigido
 
 - Formulário de avaliação em modo edição (FormularioAvaliacaoController.iniciar): o aviso à tela acontecia durante a construção dela e causava o erro !_dirty is not true ao editar pelo histórico.
-
-## [26/11/2026]
-
-### Adicionado
-
-- Integração ao app da home, do histórico, da comparação, da evolução, do dashboard e dos relatórios em PDF desenvolvidos pelo Erick (PR #16): os arquivos foram trazidos para `lib/` e `test/`, e o login passou a abrir a home.
-- Dependências `pdf` e `printing`, usadas pelos relatórios em PDF (geração do arquivo, prévia, impressão e compartilhamento).
 
 ## [25/11/2026]
 

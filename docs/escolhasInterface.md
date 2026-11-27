@@ -37,7 +37,7 @@ Essa decisão foi tomada principalmente devido ao contexto de utilização do ap
 
 O CardioRisco poderá ser utilizado durante visitas domiciliares, inclusive em ambientes externos e sob forte iluminação solar. Por isso, o alto contraste entre o fundo e os elementos da interface busca facilitar a leitura das informações.
 
-O estudo de caso também destaca a necessidade de uma interface de alto contraste para utilização em ambientes externos. :contentReference[oaicite:0]{index=0}
+O estudo de caso também destaca a necessidade de uma interface de alto contraste para utilização em ambientes externos.
 
 ### Verde
 
@@ -209,7 +209,7 @@ O fluxo principal foi organizado em quatro telas:
 3. resultado do risco cardiovascular;
 4. recomendações e orientações.
 
-Essa decisão está diretamente relacionada à restrição definida no estudo de caso, que estabelece até quatro telas principais para o protótipo. :contentReference[oaicite:1]{index=1}
+Essa decisão está diretamente relacionada à restrição definida no estudo de caso, que estabelece até quatro telas principais para o protótipo.
 
 Caso seja mantida uma tela de histórico de avaliações, ela será considerada uma funcionalidade secundária e não fará parte do fluxo principal da avaliação.
 
@@ -320,7 +320,7 @@ O velocímetro é o principal componente visual da tela de resultado.
 
 Ele foi utilizado porque transforma um percentual abstrato em uma representação visual semelhante a indicadores já conhecidos pelo usuário.
 
-O estudo de caso estabelece que o velocímetro deve estar presente na tela de resultado justamente por facilitar a comunicação do risco cardiovascular para pacientes leigos. :contentReference[oaicite:2]{index=2}
+O estudo de caso estabelece que o velocímetro deve estar presente na tela de resultado justamente por facilitar a comunicação do risco cardiovascular para pacientes leigos.
 
 O velocímetro também permite que o ACS utilize a tela do smartphone como apoio durante a explicação do resultado ao paciente.
 
@@ -393,7 +393,7 @@ O aplicativo foi pensado para funcionar em locais onde não exista conexão com 
 
 Essa condição possui grande importância porque o ACS poderá realizar visitas em áreas rurais ou periféricas.
 
-O estudo de caso determina que os dados possam ser coletados sem conexão e sincronizados posteriormente quando houver acesso à internet. :contentReference[oaicite:3]{index=3}
+O estudo de caso determina que os dados possam ser coletados sem conexão e sincronizados posteriormente quando houver acesso à internet.
 
 Por isso, a interface apresenta informações relacionadas ao estado de conectividade.
 
@@ -418,7 +418,7 @@ A mensagem apresentada poderá indicar:
 
 Essa escolha está diretamente relacionada ao requisito de anonimização definido no projeto.
 
-O estudo de caso estabelece que o histórico salvo não deve conter CPF ou nome do paciente. :contentReference[oaicite:4]{index=4}
+O estudo de caso estabelece que o histórico salvo não deve conter CPF ou nome do paciente.
 
 Também será necessário considerar a exclusão dos registros armazenados conforme as regras de privacidade definidas para o projeto.
 
@@ -520,7 +520,7 @@ Dessa maneira, o aplicativo também funciona como ferramenta de comunicação e 
 
 A interface foi planejada considerando smartphones básicos.
 
-O estudo de caso determina funcionamento em dispositivos com aproximadamente 2 GB a 4 GB de RAM e resolução HD de 720p. :contentReference[oaicite:5]{index=5}
+O estudo de caso determina funcionamento em dispositivos com aproximadamente 2 GB a 4 GB de RAM e resolução HD de 720p.
 
 Por isso, o protótipo evita:
 
@@ -560,3 +560,69 @@ Na versão de alta fidelidade foram acrescentados e refinados:
 - hierarquia visual.
 
 A evolução procurou manter a estrutura validada inicialmente, acrescentando elementos visuais e de experiência necessários para representar como o aplicativo deverá ser desenvolvido na Unidade II.
+
+---
+
+## 25. Decisões de interface da Unidade II
+
+Na Unidade II, o protótipo foi refeito em alta fidelidade (`docs/prototipoAltaFidelidadeUnidade2.pdf`) e implementado em Flutter. As decisões abaixo complementam as seções anteriores. Quando uma decisão da Unidade I mudou, isso está indicado na seção 25.8.
+
+### 25.1. Tema escuro como padrão
+
+- Fundo `#0F141A`, superfícies `#1A222C` e `#24303D`, texto principal `#F4F6F8` e texto secundário `#A0AEC0`.
+- Verde `#2ECC71` para a ação principal e o risco baixo, amarelo `#F1C40F` para o risco intermediário e vermelho `#E74C3C` para o risco alto e a marca.
+- Motivo: alto contraste para leitura sob o sol, como pede o estudo de caso, e menor consumo de bateria em telas OLED.
+- As cores ficam definidas uma única vez no tema do app (`AppTheme`) e são usadas por todas as telas. Assim, as telas feitas por integrantes diferentes ficam com a mesma aparência.
+
+### 25.2. Cabeçalho e ícone do app
+
+- As telas da avaliação têm o mesmo cabeçalho do protótipo: um coração com a linha de pulso, "Cardio" em branco e "Risco" em vermelho, e o subtítulo "AVALIAÇÃO CARDIOVASCULAR".
+- O ícone do app usa o mesmo coração com a linha de pulso sobre o fundo escuro. A versão adaptativa do Android deixa uma margem em volta do desenho, para ele não ser cortado nos formatos de ícone de cada fabricante (círculo, quadrado arredondado etc.).
+- O nome abaixo do ícone passou a ser "CardioRisco".
+
+### 25.3. Formulário em duas etapas (Telas 1 e 2)
+
+- As 7 perguntas ficaram divididas em duas etapas: dados pessoais (idade, sexo, tabagismo e diabetes) e dados clínicos (pressão sistólica, uso de remédio para pressão, colesterol total e HDL). A pergunta do remédio fica junto da pressão porque ela muda a forma de calcular a pressão no escore.
+- O indicador de etapas usa duas bolinhas numeradas ligadas por uma linha. A etapa concluída ganha um "✓".
+- As respostas de duas opções (Sim/Não, Masculino/Feminino) usam dois botões grandes lado a lado, com 52 px de altura, fáceis de tocar com uma mão durante a visita.
+- Os campos numéricos abrem o teclado de números, ignoram letras, vírgulas e espaços e aceitam no máximo 3 dígitos. A unidade (anos, mmHg, mg/dL) aparece dentro do campo.
+- Dicas embaixo dos campos evitam erros comuns: a faixa de idade aceita (30 a 74 anos) e o lembrete de que a pressão "14 por 9" deve ser digitada como 140.
+- Os erros aparecem numa caixa vermelha com texto explicando o problema ("O HDL deve ser menor que o colesterol total."), e não só pela cor.
+- O código do paciente aparece com o símbolo "#" e o aviso "(sem nome ou CPF)", deixando a privacidade visível para o profissional e para o paciente.
+- Um aviso discreto informa que o rascunho está salvo no aparelho. Isso dá segurança de que nada se perde se o app fechar no meio da visita.
+
+### 25.4. Velocímetro (Tela 3)
+
+- O velocímetro é desenhado pelo próprio app, com um arco de 3 faixas (verde, amarela e vermelha), uma para cada nível de risco.
+- Cada faixa ocupa um terço do arco, e as divisões seguem os limites da SBC para o sexo do paciente: 5% e 20% para homens, 5% e 10% para mulheres. Com isso, o ponteiro sempre cai na cor do nível escrito embaixo. Numa escala de 0 a 100%, quase todos os pacientes ficariam no começo do arco e a diferença entre os níveis quase não apareceria.
+- O protótipo tinha uma quarta cor (verde-claro), que não correspondia a nenhum nível. Ela foi retirada.
+- O ponteiro sai do zero e vai até o valor com uma animação curta, chamando a atenção do paciente para o resultado.
+- O percentual aparece grande, na cor do nível, acompanhado do selo "RISCO BAIXO", "RISCO INTERMEDIÁRIO" ou "RISCO ALTO" com um ícone. A cor nunca aparece sozinha.
+
+### 25.5. Explicação do resultado
+
+- Uma frase em linguagem simples explica o que o nível significa.
+- A lista "O que influencia seu risco?" mostra só os fatores alterados nas respostas, cada um com um ícone. Ao tocar em um fator, aparece uma explicação curta que ajuda o profissional a conversar com o paciente.
+- O painel "Saiba mais sobre o cálculo" mostra o modelo usado, as faixas da SBC para o sexo do paciente e o aviso de que o resultado não substitui a avaliação de um profissional de saúde.
+- O cartão "Pela tabela de pontos da SBC" mostra o resultado do segundo modelo de cálculo, com um texto explicando por que os dois números podem ser um pouco diferentes.
+
+### 25.6. Recomendações (Tela 4)
+
+- O cartão do topo mostra o nível, o percentual e o encaminhamento sugerido, na cor do nível de risco.
+- As recomendações aparecem em cartões com uma faixa colorida à esquerda e um ícone por assunto. Só aparecem as que fazem sentido para o paciente: "Parar de fumar" só para fumantes e "Controle do diabetes" só para quem tem diabetes.
+- Ao tocar em um cartão, aparece uma explicação mais completa.
+- O botão "Concluir e voltar ao início" fica no fim da tela, com o aviso de que a avaliação fica salva no aparelho e é enviada quando houver Wi-Fi.
+
+### 25.7. Telas novas da Unidade II
+
+As telas de login e cadastro, home, histórico, comparação, evolução, dashboard e relatórios usam o mesmo tema, os mesmos cartões escuros, os mesmos botões verdes e as mesmas cores de risco das telas da avaliação, para o app parecer um produto só.
+
+### 25.8. Mudanças em relação à Unidade I
+
+| Item | Unidade I | Unidade II | Motivo |
+|---|---|---|---|
+| Indicador de progresso | Texto "Etapa 1 de 2" (seção 6) | Bolinhas numeradas ligadas por uma linha | Igual ao protótipo de alta fidelidade e mais visual |
+| Velocímetro | 4 cores no protótipo, sem relação definida com os níveis | 3 faixas, uma por nível, com divisões nos limites da SBC | O ponteiro sempre cai na cor do nível mostrado |
+| Classificação do risco | Limites a definir (seção 14) | Baixo < 5%; intermediário de 5% a 20% (homens) ou de 5% a 10% (mulheres); alto acima disso | Escore de Risco Global da SBC |
+| Quantidade de telas | Até quatro telas principais (seção 8) | Quatro telas no fluxo da avaliação, mais as telas de acompanhamento | Novas exigências do aditivo da Unidade II |
+| Pressão arterial | Só o valor da pressão | Valor da pressão e "Usa remédio para controlar a pressão?" | O escore calcula a pressão tratada de forma diferente |

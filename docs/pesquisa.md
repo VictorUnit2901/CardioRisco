@@ -44,6 +44,44 @@ Essa diferença não significa que o grupo deverá modificar automaticamente a r
 
 Para o projeto acadêmico, a especificação fornecida no estudo de caso deverá ser respeitada, mas a existência de diretrizes mais recentes deve ser registrada como um ponto de atenção.
 
+### 2.4. Modelos de cálculo adotados no aplicativo (Unidade II)
+
+Seguindo o estudo de caso, o CardioRisco calcula o risco cardiovascular em 10 anos pelo **Escore de Risco Global (ERG)**, que a Sociedade Brasileira de Cardiologia adota a partir do modelo de risco cardiovascular geral de Framingham (D'Agostino et al., 2008). O modelo estima a chance de doença coronária, AVC, doença arterial periférica ou insuficiência cardíaca em 10 anos.
+
+O aplicativo implementa as duas formas desse escore:
+
+- **Equação de Framingham:** usa os coeficientes do artigo original e dá o percentual exato. É o valor mostrado no velocímetro.
+- **Tabela de pontos do ERG:** cada resposta vale alguns pontos e o total vira um percentual, conforme as Tabelas IV a VII da V Diretriz Brasileira de Dislipidemias (SBC, 2013). É a versão em papel usada nas UBS e aparece na Tela 3 para comparação. Como a tabela arredonda os valores, os dois resultados podem ser um pouco diferentes. Exemplo do protótipo (homem, 56 anos, PAS 140 sem remédio, colesterol total 210, HDL 45): 15% pela equação e 18,4% pela tabela, os dois classificados como risco intermediário.
+
+As variáveis usadas pelos dois modelos são idade (30 a 74 anos, faixa em que o escore é válido), sexo, colesterol total, HDL, pressão sistólica (com ou sem tratamento), tabagismo e diabetes. São as 7 perguntas do formulário.
+
+A classificação segue a Tabela X da V Diretriz:
+
+| Nível | Homens | Mulheres |
+|---|---|---|
+| Baixo | menor que 5% | menor que 5% |
+| Intermediário | de 5% a 20% | de 5% a 10% |
+| Alto | maior que 20% | maior que 10% |
+
+Os valores das tabelas de pontos foram conferidos, um a um, com o PDF da diretriz. Na linha de 2 pontos, a diretriz traz "120-139" na coluna da pressão tratada, mas a faixa 130-139 aparece de novo na linha de 3 pontos. O aplicativo segue o artigo original: 120-129 vale 2 pontos e 130-139 vale 3.
+
+**Limites deste projeto:**
+
+- A diretriz recomenda reclassificar para alto risco os pacientes de risco intermediário com fatores agravantes (Tabela VIII), como histórico familiar de doença coronária precoce. Esses fatores não são perguntados, porque o aditivo limita o formulário a 7 perguntas. Por isso, o aplicativo sempre informa que o resultado não substitui a avaliação de um profissional de saúde.
+- O escore PREVENT, citado na diretriz de 2025 (seção 2.3), não foi implementado: o estudo de caso pede o ERG/Framingham, e o PREVENT usa variáveis que o formulário não coleta, como a função renal. Fica registrado como possível evolução.
+
+**Fatores de risco mostrados na Tela 3** ("O que influencia seu risco?"):
+
+| Fator | Limite usado | Referência |
+|---|---|---|
+| Pressão arterial elevada | Sistólica ≥ 140 mmHg ou uso de remédio | 7ª Diretriz Brasileira de Hipertensão Arterial (2016) |
+| Colesterol acima do ideal | Colesterol total ≥ 190 mg/dL | Atualização da Diretriz Brasileira de Dislipidemias (2017) |
+| HDL baixo | HDL < 40 mg/dL | Atualização da Diretriz Brasileira de Dislipidemias (2017) |
+| Idade | ≥ 45 anos (homens) ou ≥ 55 anos (mulheres) | NCEP ATP III (2002) |
+| Tabagismo e diabetes | Resposta "Sim" | Variáveis do próprio escore |
+
+A recomendação de atividade física (pelo menos 150 minutos de atividade moderada por semana) segue as diretrizes da Organização Mundial da Saúde (2020).
+
 ---
 
 ## 3. Necessidades e dificuldades dos usuários
@@ -179,5 +217,17 @@ Isso é especialmente importante para o CardioRisco porque uma das finalidades d
 4. PRÉCOMA, Dalton Bertolim et al. Atualização da Diretriz de Prevenção Cardiovascular da Sociedade Brasileira de Cardiologia — 2019. Arquivos Brasileiros de Cardiologia, v. 113, n. 4, p. 787-891, 2019. DOI: 10.5935/abc.20190204.
 
 5. RACHED, Fabiana Hanna et al. Diretriz Brasileira de Dislipidemias e Prevenção da Aterosclerose — 2025. Arquivos Brasileiros de Cardiologia, v. 122, n. 9, e20250640, 2025. DOI: 10.36660/abc.20250640.
+
+6. D'AGOSTINO, Ralph B. et al. General cardiovascular risk profile for use in primary care: the Framingham Heart Study. Circulation, v. 117, n. 6, p. 743-753, 2008.
+
+7. XAVIER, Hermes Toros et al. V Diretriz Brasileira de Dislipidemias e Prevenção da Aterosclerose. Arquivos Brasileiros de Cardiologia, v. 101, n. 4, supl. 1, p. 1-22, 2013. (Tabelas IV a VII: Escore de Risco Global; Tabela X: risco absoluto final.)
+
+8. FALUDI, André Arpad et al. Atualização da Diretriz Brasileira de Dislipidemias e Prevenção da Aterosclerose — 2017. Arquivos Brasileiros de Cardiologia, v. 109, n. 2, supl. 1, p. 1-76, 2017.
+
+9. MALACHIAS, Marcus Vinícius Bolívar et al. 7ª Diretriz Brasileira de Hipertensão Arterial. Arquivos Brasileiros de Cardiologia, v. 107, n. 3, supl. 3, p. 1-83, 2016.
+
+10. NATIONAL CHOLESTEROL EDUCATION PROGRAM (NCEP). Third Report of the Expert Panel on Detection, Evaluation, and Treatment of High Blood Cholesterol in Adults (Adult Treatment Panel III). Circulation, v. 106, n. 25, p. 3143-3421, 2002.
+
+11. WORLD HEALTH ORGANIZATION. WHO guidelines on physical activity and sedentary behaviour. Genebra: WHO, 2020.
 
 6. LORENC, Theo et al. Communicating cardiovascular risk: systematic review of qualitative evidence. Patient Education and Counseling, v. 123, 108231, 2024. DOI: 10.1016/j.pec.2024.108231.

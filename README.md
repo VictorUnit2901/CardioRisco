@@ -16,6 +16,28 @@ cardiovasculares em um período de 10 anos.
 
 PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS-GP0015NOT07A
 
+## Como executar
+
+**Requisitos:** Flutter 3.50 (Dart 3.14) e Android Studio com um emulador Android (ou um celular Android com a depuração USB ligada).
+
+```bash
+flutter pub get        # baixa os pacotes do projeto
+flutter run            # compila e abre o app no emulador ou celular
+```
+
+**Testes automatizados:**
+
+```bash
+flutter test test/domain test/presentation
+```
+
+**Organização do código** (arquitetura em camadas):
+
+- `lib/domain/`: modelos e regras de negócio (cálculo do risco, fatores, recomendações e indicadores).
+- `lib/data/`: armazenamento no aparelho, sincronização e acesso ao Firebase.
+- `lib/presentation/`: telas e controladores de estado (Provider).
+- `docs/`: documentação do projeto (requisitos, personas, pesquisa, protótipos, diagramas, planejamento e uso de IA).
+
 ## Responsabilidades - Atividade 02/09/2026
 
 - José Victor Barbosa Neves: análise do problema e público-alvo.
@@ -54,3 +76,27 @@ PROGRAMAÇÃO PARA DISPOSITIVOS MÓVEIS-GP0015NOT07A
 
 - João Gabriel: Fiquei responsável pela criação do slide para a apresentação e não pude estar presente por motivos de saúde, irei apresentar o atestado após os dias que recebi.
 
+## Responsabilidades — Unidade II (novembro/2026)
+
+- **José Victor Barbosa Neves** (líder do grupo):
+  - Divisão das tarefas da Unidade II e acompanhamento do prazo de entrega.
+  - Revisão de todos os Pull Requests do grupo antes de entrarem na `main`: leitura do código e da documentação, aprovação, pedidos de ajuste e merge (PRs #4, #5, #11, #14, #16 e #17 dos colegas).
+  - Integração dos módulos do grupo no app: home e histórico do Erick (com os pacotes `pdf` e `printing`) e sincronização do João.
+  - Protótipo de alta fidelidade das telas da Unidade II no Figma (`docs/prototipoAltaFidelidadeUnidade2.pdf`).
+  - Cálculo do risco cardiovascular: equação de Framingham e Escore de Risco Global da SBC pela tabela de pontos, com validações clínicas, classificação do risco, fatores de risco e recomendações personalizadas.
+  - Telas 1 a 4 do fluxo da avaliação: formulário em 2 etapas com salvamento automático e modo edição, velocímetro, resultado e recomendações, usando Provider.
+  - Ícone e nome do app no Android.
+  - 37 testes automatizados (cálculos, validações, fatores, recomendações e telas da avaliação).
+  - Documentação: diagrama de classes, escolhas de interface (seção 25), pesquisa (fontes do cálculo), registro de uso de IA (parte própria), README e CHANGELOG.
+
+- **João Gabriel da Costa Souza:**
+  - Projeto base em Flutter com a arquitetura em camadas e configuração do Firebase (Authentication e Cloud Firestore).
+  - Login, cadastro e sessão do profissional.
+  - Armazenamento no aparelho (rascunho e fila de avaliações) e sincronização com o Firestore, enviando só no Wi-Fi e sem duplicar registros.
+  - Consentimento de privacidade, registro de auditoria de privacidade e exclusão dos dados.
+  - Registro de uso de IA (parte própria).
+
+- **Erick Gabriel Lima Matos:**
+  - Diagrama de casos de uso, fluxo de navegação e planejamento do projeto (escopo, EAP e sprints).
+  - Home, histórico (busca, filtro, detalhes, edição e exclusão), comparação entre avaliações, gráfico de evolução, dashboard do ACS e relatórios em PDF.
+  - 8 testes automatizados dos indicadores e dos relatórios.
