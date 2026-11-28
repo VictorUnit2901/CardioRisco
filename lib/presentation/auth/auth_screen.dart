@@ -38,6 +38,21 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _carregarSessaoSalva() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null && mounted) {
+      setState(() => _isLoading = true);
+      try {
+        await _ativarSincronizacaoPosLogin(currentUser.uid);
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
+        );
+        return;
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    }
+
     final salvo = await _authService.obterProfissionalSalvo();
     if (!mounted || salvo == null) return;
     setState(() {
@@ -66,6 +81,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String _mensagemErroAuth(FirebaseAuthException e) {
     switch (e.code) {
+      case 'missing-credentials':
+        return 'Informe seu e-mail e sua senha.';
       case 'invalid-email':
         return 'E-mail inválido.';
       case 'user-not-found':
@@ -76,8 +93,11 @@ class _AuthScreenState extends State<AuthScreen> {
         return 'Este e-mail já está cadastrado. Entre com sua conta.';
       case 'weak-password':
         return 'A senha deve ter pelo menos 8 caracteres.';
+      case 'offline-auth-failed':
+        return e.message ??
+            'Sem internet: não foi possível validar sua senha offline.';
       case 'network-request-failed':
-        return 'Sem conexão com a internet para autenticar.';
+        return 'Sem conexão com a internet.';
       default:
         return e.message ?? 'Erro na autenticação (${e.code}).';
     }
@@ -105,11 +125,12 @@ class _AuthScreenState extends State<AuthScreen> {
       return;
     }
 
+    if (senha.isEmpty) {
+      _mostrarMensagem('Informe sua senha.');
+      return;
+    }
+
     if (_isCadastro) {
-      if (senha.isEmpty) {
-        _mostrarMensagem('Informe sua senha.');
-        return;
-      }
       if (_nomeController.text.trim().isEmpty) {
         _mostrarMensagem('Informe o nome do profissional.');
         return;
@@ -122,24 +143,6 @@ class _AuthScreenState extends State<AuthScreen> {
         _mostrarMensagem('Aceite a Política de Privacidade para continuar.');
         return;
       }
-    } else if (senha.isEmpty) {
-      final salvo = await _authService.entrarOffline(email: email);
-      if (salvo != null && mounted) {
-        setState(() => _isLoading = true);
-        try {
-          await _ativarSincronizacaoPosLogin(salvo.uid);
-          if (!mounted) return;
-          _mostrarMensagem('Sem internet: acessando conta salva localmente.');
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
-          );
-          return;
-        } finally {
-          if (mounted) setState(() => _isLoading = false);
-        }
-      }
-      _mostrarMensagem('Informe sua senha.');
-      return;
     }
 
     setState(() => _isLoading = true);
@@ -175,32 +178,8 @@ class _AuthScreenState extends State<AuthScreen> {
         _mostrarMensagem('Não foi possível concluir o acesso.');
       }
     } on FirebaseAuthException catch (e) {
-      if (!_isCadastro && e.code == 'network-request-failed') {
-        final offline = await _authService.entrarOffline(email: email);
-        if (offline != null && mounted) {
-          await _ativarSincronizacaoPosLogin(offline.uid);
-          if (!mounted) return;
-          _mostrarMensagem('Sem internet: acessando conta salva localmente.');
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
-          );
-          return;
-        }
-      }
       _mostrarMensagem(_mensagemErroAuth(e));
     } catch (e) {
-      if (!_isCadastro) {
-        final offline = await _authService.entrarOffline(email: email);
-        if (offline != null && mounted) {
-          await _ativarSincronizacaoPosLogin(offline.uid);
-          if (!mounted) return;
-          _mostrarMensagem('Sem internet: acessando conta salva localmente.');
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const CardioHomeScreen()),
-          );
-          return;
-        }
-      }
       _mostrarMensagem('Erro inesperado ao autenticar: $e');
     } finally {
       if (mounted) {
@@ -412,7 +391,7 @@ class _AuthScreenState extends State<AuthScreen> {
               if (!_isCadastro) ...[
                 const SizedBox(height: 8),
                 const Text(
-                  'O login é necessário só no primeiro acesso. Depois disso, o app funciona mesmo sem internet.',
+                  'No primeiro acesso neste dispositivo é necessária conexão com a internet. Depois disso, você pode entrar com sua senha mesmo offline.',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                 ),

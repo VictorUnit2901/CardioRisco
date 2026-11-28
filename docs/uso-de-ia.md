@@ -13,19 +13,24 @@ Regra do grupo: todo código ou texto gerado com IA foi lido, testado e entendid
 1. **Integração com Firebase e estrutura de dados:** *"Ajude-me a estruturar a integração com Firebase Authentication e Cloud Firestore em Flutter/Dart mantendo a arquitetura do projeto e respeitando o formato do modelo de avaliação sem alterar a lógica de cálculo."*
 2. **Persistência offline e sincronização sem duplicidade:** *"Como implementar uma fila local com `shared_preferences` e `connectivity_plus` no `SyncService` para guardar avaliações sem conexão com a internet usando código anônimo e sincronizar com o Firestore ao restabelecer a rede sem duplicar registros?"*
 3. **Resolução de problemas de build e depuração Android:** *"O `flutter run` / build Android apresentou erro no Gradle ou não detectou o dispositivo/emulador; quais os passos para diagnosticar e corrigir mantendo o ambiente funcional?"*
+4. **Correção do login e autenticação offline segura:** *"Como exigir e-mail e senha em todas as tentativas de login sem bypass offline indevido, mantendo o acesso offline apenas com validação criptográfica da senha salva?"*
 
-### Erro Cometido pela IA e Como Foi Resolvido
+### Erros Cometidos pela IA e Como Foram Resolvidos
 
-* **Erro:** Inicialmente, a sugestão de sincronização automática concentrava o envio apenas em eventos de alteração de conectividade (`onConnectivityChanged`), deixando de enviar imediatamente os itens já pendentes na fila local quando o aplicativo era aberto ou o usuário fazia login com a rede já ativa, além de exigir validação cuidadosa para não alterar o `AvaliacaoModel` sem alinhamento prévio com a equipe.
-* **Resolução:** A implementação foi ajustada para disparar `sincronizarPendentes()` e `iniciarMonitoramentoAutomatico()` no fluxo pós-login e inicialização da sessão autenticada, garantindo o envio dos registros em fila mesmo com internet já disponível e evitando duplicidade pelo controle dos itens pendentes/sincronizados, mantendo intacta a estrutura de cálculo do `AvaliacaoModel`.
+- **Erro 1 — Sincronização automática restrita a mudanças de conectividade:** Inicialmente, a sugestão de sincronização automática concentrava o envio apenas em eventos de alteração de conectividade (`onConnectivityChanged`), deixando de enviar imediatamente os itens já pendentes na fila local quando o aplicativo era aberto ou o usuário fazia login com a rede já ativa, além de exigir validação cuidadosa para não alterar o `AvaliacaoModel` sem alinhamento prévio com a equipe.
+  - **Resolução:** A implementação foi ajustada para disparar `sincronizarPendentes()` e `iniciarMonitoramentoAutomatico()` no fluxo pós-login e inicialização da sessão autenticada, garantindo o envio dos registros em fila mesmo com internet já disponível e evitando duplicidade pelo controle dos itens pendentes/sincronizados, mantendo intacta a estrutura de cálculo do `AvaliacaoModel`.
+
+- **Erro 2 — Permissão de acesso sem senha / *fallback* offline indevido (botão ou fluxo "continuar off-line"):** Na revisão de controle de acesso (`a.iv`), identificou-se que o fluxo de login permitia acessar com senha vazia ou entrar sem conexão sem validar adequadamente a credencial, ao mesmo tempo em que o bloqueio puro sem validação local impedia o acesso offline de quem já possuía conta no dispositivo.
+  - **Resolução:** A validação de e-mail e senha obrigatórios foi reforçada na `AuthScreen` e no `AuthService`, removendo o *bypass* sem senha e implementando no `LocalStorageService` o armazenamento de *hash* SHA-256 com *salt* único por e-mail após login/cadastro válido online, permitindo autenticar offline apenas com a senha correspondente à conta salva localmente.
 
 ### Justificativa das Bibliotecas Utilizadas
 
-* **`firebase_core`:** Necessária para inicializar a conexão do Flutter com o projeto Firebase antes de utilizar qualquer serviço Firebase na aplicação.
-* **`firebase_auth`:** Utilizada para gerenciar a autenticação de usuários (agentes de saúde) e o estado da sessão ativa.
-* **`cloud_firestore`:** Utilizada como banco de dados remoto na nuvem para armazenar e consultar as avaliações sincronizadas.
-* **`shared_preferences`:** Utilizada para persistência local leve no dispositivo, permitindo armazenar avaliações em fila quando o aparelho está offline e manter o estado local entre sessões.
-* **`connectivity_plus`:** Utilizada para monitorar o estado da conexão com a rede (Wi-Fi, dados móveis ou offline) e acionar o `SyncService` quando a conectividade fica disponível.
+- **`firebase_core`:** Necessária para inicializar a conexão do Flutter com o projeto Firebase antes de utilizar qualquer serviço Firebase na aplicação.
+- **`firebase_auth`:** Utilizada para gerenciar a autenticação de usuários (agentes de saúde) e o estado da sessão ativa.
+- **`cloud_firestore`:** Utilizada como banco de dados remoto na nuvem para armazenar e consultar as avaliações sincronizadas.
+- **`shared_preferences`:** Utilizada para persistência local leve no dispositivo, permitindo armazenar avaliações em fila quando o aparelho está offline, manter o estado local entre sessões e guardar os metadados de *hash*/*salt* para validação offline.
+- **`connectivity_plus`:** Utilizada para monitorar o estado da conexão com a rede (Wi-Fi, dados móveis ou offline) e acionar o `SyncService` quando a conectividade fica disponível.
+- **`crypto`:** Utilizada para gerar *hash* SHA-256 com *salt* aleatório na validação local de senha em modo offline, evitando armazenar senha em texto puro ou liberar acesso sem verificação.
 
 ---
 
@@ -75,4 +80,4 @@ Regra do grupo: todo código ou texto gerado com IA foi lido, testado e entendid
 - Todo o código foi lido e explicado passo a passo antes do commit.
 - `flutter analyze` sem erros e 45 testes automatizados passando, incluindo os valores do cálculo conferidos com o artigo de D'Agostino (2008) e com as tabelas da SBC.
 - Fluxo completo testado no emulador: login, home, avaliação nas 4 telas, histórico, edição, dashboard, evolução e PDF.
-- Os textos da documentação foram redigidos com apoio da IA a partir do código e dos documentos do projeto, e revisados por mim.
+- Os textos da documentação foram redigidos com apoio da IA a partir do código e dos documentos do projeto, e revisados por mim
