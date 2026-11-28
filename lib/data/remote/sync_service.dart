@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../../domain/models/avaliacao_model.dart';
 import '../local/local_storage_service.dart';
 
 class SyncService {
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore? _firestoreInjetado;
   final Connectivity _connectivity;
   final LocalStorageService _localStorage;
 
@@ -16,9 +17,15 @@ class SyncService {
     FirebaseFirestore? firestore,
     Connectivity? connectivity,
     LocalStorageService? localStorage,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+  })  : _firestoreInjetado = firestore,
         _connectivity = connectivity ?? Connectivity(),
         _localStorage = localStorage ?? LocalStorageService();
+
+  FirebaseFirestore? get _firestore {
+    if (_firestoreInjetado != null) return _firestoreInjetado;
+    if (Firebase.apps.isEmpty) return null;
+    return FirebaseFirestore.instance;
+  }
 
   Future<bool> podeSincronizarAgora() async {
     final resultados = await _connectivity.checkConnectivity();
@@ -37,6 +44,9 @@ class SyncService {
   }
 
   Future<int> sincronizarPendentes() async {
+    final db = _firestore;
+    if (db == null) return 0;
+
     final pendentes = await _localStorage.obterPendentesSincronizacao();
     var sincronizadasCount = 0;
 
@@ -49,7 +59,7 @@ class SyncService {
         'sincronizadoEm': DateTime.now().toIso8601String(),
       };
 
-      await _firestore
+      await db
           .collection('avaliacoes')
           .doc(avaliacao.id)
           .set(payload, SetOptions(merge: true));
@@ -66,7 +76,10 @@ class SyncService {
   Future<int> recuperarAvaliacoesDaNuvem(String profissionalId) async {
     if (profissionalId.trim().isEmpty) return 0;
 
-    final snapshot = await _firestore
+    final db = _firestore;
+    if (db == null) return 0;
+
+    final snapshot = await db
         .collection('avaliacoes')
         .where('profissionalId', isEqualTo: profissionalId.trim())
         .get();

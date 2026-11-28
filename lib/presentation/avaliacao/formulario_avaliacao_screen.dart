@@ -105,6 +105,12 @@ class _FormularioViewState extends State<_FormularioView> {
     if (concluiu != true || !mounted) {
       return;
     }
+    if (form.modoEdicao) {
+      await form.registrarAuditoriaEdicao(avaliacao);
+      if (!mounted) {
+        return;
+      }
+    }
     // A avaliação foi concluída na Tela 4.
     final navegador = Navigator.of(context);
     if (navegador.canPop()) {
