@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../data/local/cardiorisco_repository.dart';
 import '../../data/local/local_storage_service.dart';
 import '../../domain/models/avaliacao_model.dart';
 import '../../domain/models/enums_avaliacao.dart';
@@ -14,10 +15,13 @@ import '../../domain/services/calculadora_risco.dart';
 class FormularioAvaliacaoController extends ChangeNotifier {
   FormularioAvaliacaoController({
     LocalStorageService? armazenamento,
+    CardioRiscoRepository? repositorio,
     this.calculadora = const CalculadoraFramingham(),
-  }) : _armazenamento = armazenamento ?? LocalStorageService();
+  })  : _armazenamento = armazenamento ?? LocalStorageService(),
+        _repositorio = repositorio ?? CardioRiscoRepository();
 
   final LocalStorageService _armazenamento;
+  final CardioRiscoRepository _repositorio;
 
   /// Modelo de risco usado no cálculo (Framingham, se nada for passado).
   final CalculadoraRisco calculadora;
@@ -26,6 +30,7 @@ class FormularioAvaliacaoController extends ChangeNotifier {
 
   /// Dados fixos da avaliação: id, código do paciente, profissional e data.
   AvaliacaoModel? _base;
+  AvaliacaoModel? _avaliacaoOriginal;
 
   bool _carregando = true;
   bool _modoEdicao = false;
@@ -71,9 +76,12 @@ class FormularioAvaliacaoController extends ChangeNotifier {
       // redesenha a tela no meio da construção ("!_dirty is not true").
       await Future<void>.delayed(Duration.zero);
       _modoEdicao = true;
+      _avaliacaoOriginal = avaliacaoExistente;
       _etapa = 1;
       inicial = avaliacaoExistente;
     } else {
+      _modoEdicao = false;
+      _avaliacaoOriginal = null;
       final rascunho = await _armazenamento.obterRascunho();
       if (rascunho != null) {
         _etapa = rascunho.etapaAtual;
@@ -96,6 +104,7 @@ class FormularioAvaliacaoController extends ChangeNotifier {
     _temporizadorSalvamento?.cancel();
     final nova = await _criarNova();
     _modoEdicao = false;
+    _avaliacaoOriginal = null;
     _etapa = 1;
     _erros = const [];
     _rascunhoSalvo = false;
@@ -203,6 +212,15 @@ class FormularioAvaliacaoController extends ChangeNotifier {
     }
     _avisar();
     return avaliacao.copyWith(resultado: calculadora.calcular(avaliacao));
+  }
+
+  /// Registra a auditoria quando uma avaliação já existente é editada.
+  Future<void> registrarAuditoriaEdicao(AvaliacaoModel avaliacaoAtualizada) async {
+    if (!_modoEdicao) return;
+    await _repositorio.registrarEdicaoAvaliacao(
+      avaliacaoAtual: avaliacaoAtualizada,
+      avaliacaoAnterior: _avaliacaoOriginal,
+    );
   }
 
   /// Junta os dados fixos com as respostas atuais em uma AvaliacaoModel.

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/models/avaliacao_model.dart';
@@ -9,6 +10,7 @@ class LocalStorageService {
   static const _keyAvaliacoesLocais = 'cardiorisco_avaliacoes_locais';
   static const _keyUltimoCodigoPaciente = 'cardiorisco_ultimo_codigo_paciente';
   static const _keyApenasWifi = 'cardiorisco_apenas_wifi';
+  static const _keyFilaAuditoriaEdicoes = 'cardiorisco_fila_auditoria_edicoes';
 
   // --- Sessão / Perfil ---
   Future<void> salvarProfissional(ProfissionalModel profissional) async {
@@ -170,6 +172,27 @@ class LocalStorageService {
     await salvarAvaliacoesLocais(resultado);
   }
 
+  // --- Fila offline de auditoria de edições ---
+  Future<void> enfileirarAuditoriaEdicao(Map<String, dynamic> registro) async {
+    final prefs = await SharedPreferences.getInstance();
+    final atuais = prefs.getStringList(_keyFilaAuditoriaEdicoes) ?? [];
+    atuais.add(jsonEncode(registro));
+    await prefs.setStringList(_keyFilaAuditoriaEdicoes, atuais);
+  }
+
+  Future<List> obterFilaAuditoriaEdicoes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final brutos = prefs.getStringList(_keyFilaAuditoriaEdicoes) ?? [];
+    return brutos
+        .map((item) => Map<String, dynamic>.from(jsonDecode(item) as Map))
+        .toList();
+  }
+
+  Future<void> limparFilaAuditoriaEdicoes() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyFilaAuditoriaEdicoes);
+  }
+
   // --- Exclusão definitiva dos dados locais ---
   Future<void> limparTodosDadosLocais() async {
     final prefs = await SharedPreferences.getInstance();
@@ -178,5 +201,6 @@ class LocalStorageService {
     await prefs.remove(_keyAvaliacoesLocais);
     await prefs.remove(_keyUltimoCodigoPaciente);
     await prefs.remove(_keyApenasWifi);
+    await prefs.remove(_keyFilaAuditoriaEdicoes);
   }
 }
