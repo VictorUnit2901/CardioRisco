@@ -1,14 +1,30 @@
 import 'dart:convert';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/models/avaliacao_model.dart';
 import '../../domain/models/profissional_model.dart';
 
 class LocalStorageService {
   static const _keyProfissional = 'cardiorisco_profissional';
+  static const _keyCredenciaisOffline = 'cardiorisco_credenciais_offline_v1';
   static const _keyRascunhoAvaliacao = 'cardiorisco_rascunho_avaliacao';
   static const _keyAvaliacoesLocais = 'cardiorisco_avaliacoes_locais';
   static const _keyUltimoCodigoPaciente = 'cardiorisco_ultimo_codigo_paciente';
   static const _keyApenasWifi = 'cardiorisco_apenas_wifi';
+
+  String _normalizarEmailLocal(String email) => email.trim().toLowerCase();
+
+  String _gerarSalt() {
+    final random = Random.secure();
+    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
+    return base64UrlEncode(bytes);
+  }
+
+  String _gerarHashSenha(String senha, String salt) {
+    final bytes = utf8.encode('$salt:$senha');
+    return sha256.convert(bytes).toString();
+  }
 
   // --- Sessão / Perfil ---
   Future<void> salvarProfissional(ProfissionalModel profissional) async {
@@ -26,6 +42,54 @@ class LocalStorageService {
   Future<void> limparProfissional() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyProfissional);
+  }
+
+  // --- Credenciais Offline (SHA-256 + salt) ---
+  Future<void> salvarCredencialOffline({
+    required String email,
+    required String senha,
+  }) async {
+    final emailNormalizado = _normalizarEmailLocal(email);
+    if (emailNormalizado.isEmpty || senha.isEmpty) return;
+
+    final salt = _gerarSalt();
+    final hash = _gerarHashSenha(senha, salt);
+
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_keyCredenciaisOffline);
+    final mapa = raw != null && raw.isNotEmpty
+        ? Map<String, dynamic>.from(jsonDecode(raw) as Map)
+        : <String, dynamic>{};
+
+    mapa[emailNormalizado] = {
+      'salt': salt,
+      'hash': hash,
+    };
+
+    await prefs.setString(_keyCredenciaisOffline, jsonEncode(mapa));
+  }
+
+  Future<bool> validarCredencialOffline({
+    required String email,
+    required String senha,
+  }) async {
+    final emailNormalizado = _normalizarEmailLocal(email);
+    if (emailNormalizado.isEmpty || senha.isEmpty) return false;
+
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_keyCredenciaisOffline);
+    if (raw == null || raw.isEmpty) return false;
+
+    final mapa = Map<String, dynamic>.from(jsonDecode(raw) as Map);
+    final registro = mapa[emailNormalizado];
+    if (registro is! Map) return false;
+
+    final salt = registro['salt']?.toString() ?? '';
+    final hashSalvo = registro['hash']?.toString() ?? '';
+    if (salt.isEmpty || hashSalvo.isEmpty) return false;
+
+    final hashDigitado = _gerarHashSenha(senha, salt);
+    return hashDigitado == hashSalvo;
   }
 
   // --- Preferência de Wi-Fi ---
@@ -174,6 +238,7 @@ class LocalStorageService {
   Future<void> limparTodosDadosLocais() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyProfissional);
+    await prefs.remove(_keyCredenciaisOffline);
     await prefs.remove(_keyRascunhoAvaliacao);
     await prefs.remove(_keyAvaliacoesLocais);
     await prefs.remove(_keyUltimoCodigoPaciente);

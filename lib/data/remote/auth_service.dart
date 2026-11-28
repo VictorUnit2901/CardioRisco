@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../domain/models/profissional_model.dart';
@@ -42,26 +41,8 @@ class AuthService {
     return _localStorage.obterProfissional();
   }
 
-  /// Permite entrar offline APENAS se já existir um perfil cadastrado e salvo
-  /// localmente para o mesmo e-mail (evita criar conta duplicada ou falsa).
-  Future<ProfissionalModel?> entrarOffline({required String email}) async {
-    final salvo = await _localStorage.obterProfissional();
-    if (salvo == null) return null;
-
-    final emailInformado = _normalizarEmail(email);
-    final emailSalvo = _normalizarEmail(salvo.email);
-
-    if (emailSalvo.isEmpty || emailInformado != emailSalvo) {
-      return null;
-    }
-
-    return salvo;
-  }
-
   bool _isErroDeRede(Object error) {
-    if (error is SocketException || error is TimeoutException) {
-      return true;
-    }
+    if (error is TimeoutException) return true;
     if (error is FirebaseAuthException &&
         error.code == 'network-request-failed') {
       return true;
@@ -73,7 +54,8 @@ class AuthService {
     return texto.contains('network') ||
         texto.contains('socket') ||
         texto.contains('unavailable') ||
-        texto.contains('timed out');
+        texto.contains('timed out') ||
+        texto.contains('failed host lookup');
   }
 
   Future<ProfissionalModel?> login({
@@ -81,6 +63,13 @@ class AuthService {
     required String senha,
   }) async {
     final emailLimpo = email.trim();
+
+    if (emailLimpo.isEmpty || senha.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'missing-credentials',
+        message: 'Informe e-mail e senha.',
+      );
+    }
 
     try {
       final credencial = await _auth
@@ -143,12 +132,30 @@ class AuthService {
       }
 
       await _localStorage.salvarProfissional(profissional);
+      await _localStorage.salvarCredencialOffline(
+        email: emailLimpo,
+        senha: senha,
+      );
       return profissional;
     } catch (e) {
       if (_isErroDeRede(e)) {
-        final offlineUser = await entrarOffline(email: emailLimpo);
-        if (offlineUser != null) {
-          return offlineUser;
+        final senhaValidaOffline = await _localStorage.validarCredencialOffline(
+          email: emailLimpo,
+          senha: senha,
+        );
+        if (!senhaValidaOffline) {
+          throw FirebaseAuthException(
+            code: 'offline-auth-failed',
+            message:
+                'Sem internet: informe a senha válida da conta salva neste aparelho.',
+          );
+        }
+
+        final salvoLocal = await _localStorage.obterProfissional();
+        if (salvoLocal != null &&
+            _normalizarEmail(salvoLocal.email) ==
+                _normalizarEmail(emailLimpo)) {
+          return salvoLocal;
         }
       }
       rethrow;
@@ -190,6 +197,10 @@ class AuthService {
         .set(profissional.toMap(), SetOptions(merge: true));
 
     await _localStorage.salvarProfissional(profissional);
+    await _localStorage.salvarCredencialOffline(
+      email: emailLimpo,
+      senha: senha,
+    );
     return profissional;
   }
 
